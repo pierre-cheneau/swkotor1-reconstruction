@@ -28,12 +28,13 @@ import argparse
 import bisect
 import csv
 import json
-import re
 import subprocess
 from html import escape
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+import playable
+
+ROOT = playable.ROOT
 OUTPUT = ROOT / "matching" / "assets" / "progress.svg"
 LIBRARY = ROOT / "matching" / "crt_libcmt.csv"   # stock LIBCMT.LIB functions
 CRT_BANDS = ((0x006FA390, 0x0070C0A0), (0x00713190, 0x00713E80))   # statically linked C runtime
@@ -41,10 +42,6 @@ CRT_BANDS = ((0x006FA390, 0x0070C0A0), (0x00713190, 0x00713E80))   # statically 
 TEXT_START, TEXT_END = 0x00401000, 0x0073D000   # .text of the 1.0.3.0 exe
 CELL_BYTES = 0x1000
 MAP_COLUMNS = 46
-SOURCE_SUFFIXES = {".cpp", ".h", ".hpp", ".inc"}
-DEFINITION = re.compile(
-    r"\b[A-Za-z_]\w*?_(00[4-7][0-9a-fA-F]{5})\s*\(([^;{}()]|\([^()]*\))*\)\s*"
-    r"(?:const\s*)?(?:noexcept\s*)?(?:->\s*[\w:<>*& ]+)?\{")
 
 # (milestone, state) from STATUS.md; state is done, open or todo.
 PLAYABLE = [
@@ -83,24 +80,6 @@ def previous_status(report: Path, current: dict[int, str]) -> dict[int, str] | N
     except (OSError, ValueError, KeyError, subprocess.CalledProcessError):
         pass
     return None
-
-
-CITED = re.compile(r"(?<![0-9A-Fa-fx])(00[4-7][0-9A-Fa-f]{5})(?![0-9A-Fa-f])")
-
-
-def playable_coverage() -> dict[int, int]:
-    """Original address -> 2 if src/ defines a function under that address,
-    1 if src/ only cites it (inlined, folded into a caller, or shared with an
-    identical function)."""
-    coverage: dict[int, int] = {}
-    for path in (ROOT / "src").rglob("*"):
-        if path.suffix in SOURCE_SUFFIXES:
-            text = path.read_text(encoding="utf-8", errors="replace")
-            for m in CITED.finditer(text):
-                coverage.setdefault(int(m.group(1), 16), 1)
-            for m in DEFINITION.finditer(text):
-                coverage[int(m.group(1), 16)] = 2
-    return coverage
 
 
 def load_functions(status: dict[int, str], table: Path, playable: dict[int, int]):
@@ -306,10 +285,10 @@ def render(functions, units: int, complete: bool, old_status: dict[int, str] | N
                 f'0x{low:08X}</text>')
         shares: dict[str, int] = {}
         first = max(0, bisect.bisect_right(starts, low) - 1)
-        for start, length, category, playable in functions[first:bisect.bisect_left(starts, low + CELL_BYTES)]:
+        for start, length, category, level in functions[first:bisect.bisect_left(starts, low + CELL_BYTES)]:
             overlap = min(start + length, low + CELL_BYTES) - max(start, low)
             if overlap > 0:
-                k = map_class(category, playable)
+                k = map_class(category, level)
                 shares[k] = shares.get(k, 0) + overlap
         add(f'<rect x="{x_map + column * pitch_x:.1f}" y="{map_top + row * pitch_y}" '
             f'width="{pitch_x - 2:.1f}" height="{size_y}" rx="2" fill="{cell_color(shares)}"/>')
@@ -352,7 +331,7 @@ def main() -> None:
     units = len(manifest["targets"]["game"]["units"])
     status = read_status(args.report.read_text(encoding="utf-8"))
     complete = bool(manifest.get("game_complete"))
-    functions = load_functions(status, args.function_table, playable_coverage())
+    functions = load_functions(status, args.function_table, playable.coverage(playable.scan()))
     args.out.parent.mkdir(parents=True, exist_ok=True)
     content = render(functions, units, complete, previous_status(args.report, status))
     if not args.out.exists() or args.out.read_bytes() != content.encode("utf-8"):

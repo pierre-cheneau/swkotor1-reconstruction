@@ -30,64 +30,35 @@ from pathlib import Path
 
 import pefile
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import matchcmp  # noqa: E402
+import matchcmp
+from coff import DIR32, REL32, CoffObject
 
 ROOT = matchcmp.ROOT
 OUTPUT = ROOT / "matching" / "symbols.csv"
-REL32, DIR32 = 0x14, 0x06
 
 
 def relocated_functions(obj):
     """{function symbol: [(offset, type, target symbol, target is code)]}."""
-    data = obj.read_bytes()
-    _, nsect, _, symptr, nsyms, opt, _ = struct.unpack_from("<HHIIIHH", data, 0)
-    sections = []
-    for i in range(nsect):
-        off = 20 + opt + i * 40
-        _, _, rel_ptr, _, nrel, _, flags = struct.unpack_from("<IIIIHHI", data, off + 16)
-        sections.append((rel_ptr, nrel, flags))
-    strtab = symptr + nsyms * 18
-    names, kinds, defined = {}, {}, []
-    i = 0
-    while i < nsyms:
-        entry = data[symptr + i * 18:symptr + i * 18 + 18]
-        if entry[:4] == b"\0\0\0\0":
-            start = strtab + struct.unpack_from("<I", entry, 4)[0]
-            name = data[start:data.index(b"\0", start)].decode("latin-1")
-        else:
-            name = entry[:8].rstrip(b"\0").decode("latin-1")
-        value, secnum, typ, klass, naux = struct.unpack_from("<IhHBB", entry, 8)
-        names[i] = name
-        kinds[i] = typ == 0x20
-        if typ == 0x20 and secnum > 0 and klass in (2, 3):
-            defined.append((name, secnum, value))
-        i += 1 + naux
-    result = {}
-    for name, secnum, value in defined:
-        rel_ptr, nrel, _ = sections[secnum - 1]
-        relocs = []
-        for r in range(nrel):
-            vaddr, index, rtype = struct.unpack_from("<IIH", data, rel_ptr + r * 10)
-            if rtype in (REL32, DIR32) and vaddr >= value:
-                relocs.append((vaddr - value, rtype, names[index], kinds[index]))
-        result[name] = relocs
-    return result
+    coff = CoffObject.read(obj)
+    return {symbol.name: [(r.offset - symbol.value, r.type, coff.symbols[r.symbol].name,
+                           coff.symbols[r.symbol].is_function)
+                          for r in coff.section_of(symbol).relocations
+                          if r.type in (REL32, DIR32) and r.offset >= symbol.value]
+            for symbol in coff.defined_functions()}
 
 
-def scan(src, flags, matched, pe):
+def scan(src, flags, matched, pe, msvc):
     """[(symbol, address, role)] for the matched functions in one source."""
     wanted = [(a, q) for a, q in matchcmp.annotated_functions(src) if a in matched]
     if not wanted:
         return []
     with tempfile.TemporaryDirectory() as tmp:
-        funcs = relocated_functions(matchcmp.compile_source(src, flags, tmp))
-    readable = matchcmp.demangle(list(funcs))
+        funcs = relocated_functions(matchcmp.compile_source(src, flags, tmp, msvc))
+    readable = matchcmp.demangle(list(funcs), msvc)
     base = pe.OPTIONAL_HEADER.ImageBase
     out = []
     for address, qualname in wanted:
-        hits = [s for s in funcs if f"{qualname}(" in readable[s]
-                or readable[s].endswith(qualname) or s == qualname]
+        hits = matchcmp.symbols_named(qualname, readable)
         if len(hits) != 1:
             continue
         symbol = hits[0]
@@ -113,7 +84,7 @@ def main():
     args = parser.parse_args()
     if not args.msvc or not args.exe:
         sys.exit("pass --msvc and --exe (or set KOTOR_MSVC7 and KOTOR_ORIGINAL_EXE)")
-    matchcmp.MSVC, matchcmp.EXE = Path(args.msvc), Path(args.exe)
+    msvc = Path(args.msvc)
     with open(args.status, encoding="utf-8") as source:
         rows = [r for r in csv.DictReader(source) if r["status"] == "MATCH"]
     matched = {int(r["address"], 16) for r in rows}
@@ -122,7 +93,7 @@ def main():
     matchcmp.start_wineserver()
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
         found = [x for part in pool.map(
-            lambda s: scan(s, matchcmp.DEFAULT_FLAGS, matched, pe), sources) for x in part]
+            lambda s: scan(s, matchcmp.DEFAULT_FLAGS, matched, pe, msvc), sources) for x in part]
 
     addresses, roles, uses = defaultdict(Counter), defaultdict(set), Counter()
     for symbol, address, role in found:
@@ -131,7 +102,7 @@ def main():
         uses[symbol] += 1
     clean = {s: next(iter(c)) for s, c in addresses.items() if len(c) == 1}
     conflicts = sorted(s for s, c in addresses.items() if len(c) > 1)
-    readable = matchcmp.demangle(sorted(clean))
+    readable = matchcmp.demangle(sorted(clean), msvc)
     with OUTPUT.open("w", newline="", encoding="utf-8") as out:
         writer = csv.writer(out, lineterminator="\n")
         writer.writerow(["symbol", "demangled", "address", "role", "uses"])

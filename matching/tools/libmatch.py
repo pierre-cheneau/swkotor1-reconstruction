@@ -9,13 +9,13 @@ usage: python matching/tools/libmatch.py <msvc7>/LIB/LIBCMT.LIB <swkotor.exe> ou
 matching/crt_libcmt.csv keeps the hits at 0x006F0000 and up with a single
 placement (LIBCMT, LIBCPMT, LIBCIMT). Functions under 6 bytes are skipped.
 """
-import bisect
 import csv
-import struct
 import sys
 from collections import defaultdict
 
 import pefile
+
+from coff import CODE, DIR32, DIR32NB, EXTERNAL, I386, REL32, STATIC, CoffObject
 
 MIN_SIZE = 6
 
@@ -41,47 +41,25 @@ def ar_members(data):
 
 def coff_functions(obj):
     """[(symbol, code bytes, masked offset set)] for functions in code sections."""
-    machine, nsec, _, symptr, nsym, optsize, _ = struct.unpack_from("<HHIIIHH", obj, 0)
-    if machine != 0x14C or nsym == 0:
+    coff = CoffObject(obj)
+    if coff.machine != I386 or not coff.symbols:
         return []
-    sections = []
-    for i in range(nsec):
-        off = 20 + optsize + i * 40
-        name, vsize, vaddr, rawsize, rawptr, relptr, _, nrel, _, flags = struct.unpack_from(
-            "<8sIIIIIIHHI", obj, off)
-        sections.append((rawsize, rawptr, relptr, nrel, flags))
-    strtab = symptr + nsym * 18
-
-    def symname(raw):
-        if raw[:4] == b"\0\0\0\0":
-            o = struct.unpack_from("<I", raw, 4)[0]
-            return obj[strtab + o:obj.index(b"\0", strtab + o)].decode("latin-1")
-        return raw.rstrip(b"\0").decode("latin-1")
-
     per_section = defaultdict(list)
-    i = 0
-    while i < nsym:
-        raw, value, secnum, typ, cls, naux = struct.unpack_from("<8sIhHBB", obj, symptr + i * 18)
-        if secnum > 0 and cls in (2, 3) and (typ >> 4) == 2 or (secnum > 0 and cls == 2):
-            per_section[secnum].append((value, symname(raw)))
-        i += 1 + naux
+    for s in coff.symbols.values():
+        # External symbols of any type, static ones only when they are functions.
+        if s.section > 0 and (s.storage_class == EXTERNAL or (s.storage_class == STATIC and s.type >> 4 == 2)):
+            per_section[s.section].append((s.value, s.name))
     out = []
-    for secnum, syms in per_section.items():
-        rawsize, rawptr, relptr, nrel, flags = sections[secnum - 1]
-        if not flags & 0x20 or rawptr == 0:  # code only
+    for number, symbols in per_section.items():
+        section = coff.sections[number - 1]
+        if not section.characteristics & CODE or not section.initialized:
             continue
-        code = obj[rawptr:rawptr + rawsize]
-        masked = set()
-        for r in range(nrel):
-            vaddr, _, rtype = struct.unpack_from("<IIH", obj, relptr + r * 10)
-            if rtype in (0x06, 0x07, 0x14):  # DIR32, DIR32NB, REL32
-                masked.update(range(vaddr, vaddr + 4))
-        starts = sorted(set(syms))
+        masked = {r.offset + k for r in section.relocations if r.type in (DIR32, DIR32NB, REL32) for k in range(4)}
+        starts = sorted(set(symbols))
         for k, (value, name) in enumerate(starts):
-            end = starts[k + 1][0] if k + 1 < len(starts) else rawsize
+            end = starts[k + 1][0] if k + 1 < len(starts) else len(section.data)
             if end - value >= MIN_SIZE:
-                out.append((name, code[value:end],
-                            {m - value for m in masked if value <= m < end}))
+                out.append((name, section.data[value:end], {m - value for m in masked if value <= m < end}))
     return out
 
 

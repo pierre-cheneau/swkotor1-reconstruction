@@ -224,11 +224,10 @@ def write_dll(path: Path, exports: list[str], seed: int) -> bytes:
     return image
 
 
+def write_code_image(path: Path, code: bytes) -> None:
+    """An executable whose .text, at the original's 00401000, holds code."""
+    path.write_bytes(_pe([(b".text", 0x401000, len(code), code, 0x60000020)], {}, dll=False))
+
+
 MSS32_EXPORTS = ["_AIL_quick_handles@12", "_AIL_startup@0", "AIL_debug_printf", "_AIL_set_preference@8"]
 BINK_EXPORTS = ["_BinkOpen@8", "_BinkClose@4", "_BinkDoFrame@4", "_BinkSetVolume@12"]
-
-
-def rules_references(rules_src: Path) -> int:
-    pattern = re.compile(r"kotor_rules_(?:str|cell(?:8|16|32))_[0-9a-f]{8}")
-    return sum(len(pattern.findall(p.read_text(encoding="utf-8")))
-               for p in rules_src.iterdir() if p.suffix in {".cpp", ".h"})

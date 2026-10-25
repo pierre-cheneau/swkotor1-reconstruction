@@ -845,7 +845,6 @@ def ppc_jump_table(words, fn, before, j, read, flow=None):
         return None
     flow = flow if flow is not None else ppc_flow(words, fn)[0]
     chain = ppc_chain(flow, j)
-    at = {i: k for k, i in enumerate(chain)}
 
     def writer(k, reg):
         """The position on the chain of the last write to reg before position k."""

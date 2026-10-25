@@ -31,25 +31,12 @@ from __future__ import annotations
 import argparse
 import csv
 import os
-import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-SUFFIXES = {".cpp", ".h", ".hpp", ".inc"}
-DEFINITION = re.compile(
-    r"\b[A-Za-z_]\w*?_(00[4-7][0-9a-fA-F]{5})\s*\(([^;{}()]|\([^()]*\))*\)\s*"
-    r"(?:const\s*)?(?:noexcept\s*)?(?:->\s*[\w:<>*& ]+)?\{")
+import playable
 
-
-def playable_index() -> dict[int, tuple[Path, int]]:
-    """address -> (file, line) of the first src/ definition."""
-    found: dict[int, tuple[Path, int]] = {}
-    for path in sorted(p for p in (ROOT / "src").rglob("*") if p.suffix in SUFFIXES):
-        text = path.read_text(encoding="utf-8", errors="replace")
-        for m in DEFINITION.finditer(text):
-            found.setdefault(int(m.group(1), 16), (path, text.count("\n", 0, m.start()) + 1))
-    return found
+ROOT = playable.ROOT
 
 
 def body(path: Path, line: int) -> str:
@@ -100,7 +87,7 @@ def main() -> None:
     args = parser.parse_args()
     names = mac_names(args.names)
 
-    index = playable_index()
+    index = playable.definition_index(playable.scan())
     if args.address:
         hit = index.get(int(args.address, 16))
         if not hit:
