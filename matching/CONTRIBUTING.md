@@ -17,7 +17,7 @@ You need three things that this repository does not ship:
 - **Your purchased GOG 1.03 `swkotor.exe`**, SHA-256
   `9c10e0450a6eeca417e036e3cde7474fed1f0a92aab018446d156944dea91435`.
   Keep it outside the checkout.
-- **Python 3 with `pefile`**: `python -m pip install pefile==2024.8.26`.
+- **[uv](https://docs.astral.sh/uv/)**: `uv sync` in the checkout installs `pefile` and `capstone`.
 
 Point the tools at the first two. Environment variables last only for the
 current shell, and AI agents often get a fresh shell per command, so set
@@ -41,7 +41,7 @@ yourself, use the dash form (`-O2`): Git Bash rewrites `/O2` into a path.
 about 10 seconds to a few minutes depending on the machine:
 
 ```bash
-python matching/tools/matchcmp.py -q matching/src
+uv run matching/tools/matchcmp.py -q matching/src
 grep -c ',MATCH,' matching/status.csv
 ```
 
@@ -51,9 +51,9 @@ it's lower, the compiler or exe is wrong.
 ## 2. Pick work
 
 ```bash
-python matching/tools/todo.py                      # smallest functions with no source yet
-python matching/tools/todo.py --range 0x5E0000 0x620000 -n 50
-python matching/tools/todo.py --near               # attempts closest to matching
+uv run matching/tools/todo.py                      # smallest functions with no source yet
+uv run matching/tools/todo.py --range 0x5E0000 0x620000 -n 50
+uv run matching/tools/todo.py --near               # attempts closest to matching
 grep -i 0x0062B050 matching/status.csv            # is an address taken already?
 ```
 
@@ -117,7 +117,7 @@ together), since they share headers.
    void CGuiInGame::UpdateCombatMode() {}
    ```
    ```bash
-   python matching/tools/matchcmp.py -v matching/src/n/gui_in_game_n.cpp
+   uv run matching/tools/matchcmp.py -v matching/src/n/gui_in_game_n.cpp
    ```
    `-v` prints nothing extra for a function that already matches.
 4. **Write it in 2002 style:**
@@ -151,13 +151,13 @@ together), since they share headers.
 1. Note the count before your change (`grep -c ',MATCH,' matching/status.csv`),
    then rerun the whole track and refresh the report:
    ```bash
-   python matching/tools/matchcmp.py -q --report matching/status.csv matching/src
+   uv run matching/tools/matchcmp.py -q --report matching/status.csv matching/src
    grep -c ',MATCH,' matching/status.csv
    ```
    - The count must not go down.
    - Look for lines like `!! 0x0062b050 annotated twice: <file> and <file>`;
      even with `-q` they go to standard output. Fix any before committing.
-2. Run `python matching/tools/symbolmap.py`. It refreshes `symbols.csv` and
+2. Run `uv run matching/tools/symbolmap.py`. It refreshes `symbols.csv` and
    prints every symbol that maps to more than one address. A new entry
    there usually means a naming slip in your change.
 3. Commit the sources, headers, `matching/status.csv` and

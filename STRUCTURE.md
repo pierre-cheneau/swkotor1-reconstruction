@@ -40,6 +40,8 @@ through git history.
 
 ```
 src/, build.py, build-manifest.json, local_generators/   playable build (unchanged)
+pin_sources.py            refresh the source hashes build-manifest.json pins
+tests/                    tooling tests and golden outputs, on synthetic game files only
 matching/
   src/<bucket>/*.cpp        matched sources; buckets are address ranges, see below
   include/<bucket>/*.h      2002-style class declarations at original offsets
@@ -57,6 +59,7 @@ matching/
   tools/test_ppcnames.py    its regression tests, on synthetic inputs
   tools/render_banner.py    render the tracker
 .github/workflows/update-progress-tracker.yml
+.github/workflows/tooling.yml                  lint, pins and tooling tests
 ```
 
 Buckets `a`..`n` are address ranges of the exe. They let parallel work
@@ -143,9 +146,9 @@ to run the tools, and the source-shape patterns that make functions match.
 2. **Reproduce the numbers** (needs MSVC 7.0 and your exe; see
    [matching/CONTRIBUTING.md](matching/CONTRIBUTING.md)):
    ```powershell
-   python .\matching\tools\matchcmp.py -q matching\src                 # 5,252 / 5,756
-   python .\matching\tools\libmatch.py "<msvc7>\LIB\LIBCMT.LIB" "<swkotor.exe>" out.csv
-   python .\matching\tools\render_banner.py                            # tracker, no compiler needed
+   uv run .\matching\tools\matchcmp.py -q matching\src                 # 5,252 / 5,756
+   uv run .\matching\tools\libmatch.py "<msvc7>\LIB\LIBCMT.LIB" "<swkotor.exe>" out.csv
+   uv run .\matching\tools\render_banner.py                            # tracker, no compiler needed
    ```
 3. **Contributing afterwards:** people and AI agents follow
    [matching/CONTRIBUTING.md](matching/CONTRIBUTING.md).

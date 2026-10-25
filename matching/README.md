@@ -81,10 +81,10 @@ Requirements:
 - Your purchased GOG 1.03 `swkotor.exe`, SHA-256
   `9c10e0450a6eeca417e036e3cde7474fed1f0a92aab018446d156944dea91435`, kept
   outside this checkout.
-- Python with `pefile` (see [BUILDING.md](../BUILDING.md)).
+- [uv](https://docs.astral.sh/uv/): `uv sync` installs `pefile` and `capstone` (see [BUILDING.md](../BUILDING.md)).
 
 ```powershell
-python .\matching\tools\matchcmp.py --msvc "C:\Tools\msvc7" --exe "D:\Games\Star Wars - KotOR\swkotor.exe" -q matching\src
+uv run .\matching\tools\matchcmp.py --msvc "C:\Tools\msvc7" --exe "D:\Games\Star Wars - KotOR\swkotor.exe" -q matching\src
 ```
 
 - `-v` prints a side-by-side disassembly (original | ours) for misses, with
@@ -150,7 +150,7 @@ VS.NET 2002, unmodified. `tools/libmatch.py` splits every function out of
 the MSVC 7.0 `LIB\*.LIB` files, masks relocations and searches the exe:
 
 ```powershell
-python .\matching\tools\libmatch.py "C:\Tools\msvc7\LIB\LIBCMT.LIB" "D:\Games\Star Wars - KotOR\swkotor.exe" out.csv
+uv run .\matching\tools\libmatch.py "C:\Tools\msvc7\LIB\LIBCMT.LIB" "D:\Games\Star Wars - KotOR\swkotor.exe" out.csv
 ```
 
 - In the CRT band (0x006FA390–0x0070C0A0 and 0x00713190–0x00713E80), 395 of
@@ -177,7 +177,7 @@ of identical code in the original, or naming slips in headers. Phase 2 in
 file. Rerun it after merging matches:
 
 ```powershell
-python .\matching\tools\symbolmap.py --msvc "C:\Tools\msvc7" --exe "D:\Games\Star Wars - KotOR\swkotor.exe"
+uv run .\matching\tools\symbolmap.py --msvc "C:\Tools\msvc7" --exe "D:\Games\Star Wars - KotOR\swkotor.exe"
 ```
 
 ## Names from the Mac PowerPC builds
@@ -192,8 +192,8 @@ names. It needs your own copies of the Mac executables, runs on any OS and
 does not need MSVC:
 
 ```powershell
-python .\matching\tools\ppcnames.py --exe "D:\Games\Star Wars - KotOR\swkotor.exe" --ppc "<2004 app>\Contents\MacOS\Knights of the Old Republic" "<2009 app>\Contents\MacOS\XKOTOR" --out "D:\KotorBuilds\ppcnames-01"
-python .\matching\tools\ppcnames.py ... --holdout 0.2      # precision of each signal
+uv run .\matching\tools\ppcnames.py --exe "D:\Games\Star Wars - KotOR\swkotor.exe" --ppc "<2004 app>\Contents\MacOS\Knights of the Old Republic" "<2009 app>\Contents\MacOS\XKOTOR" --out "D:\KotorBuilds\ppcnames-01"
+uv run .\matching\tools\ppcnames.py ... --holdout 0.2      # precision of each signal
 ```
 
 Either build works alone. Signals, in order: names this project already
@@ -210,7 +210,7 @@ confirm it against the code before annotating. `todo.py --names
 matching/mac_names.csv` shows the name and source file next to each
 unclaimed function. [research/mac-ppc-names.md](research/mac-ppc-names.md)
 has the method, results and what the pairing found about this repository.
-`python -m unittest discover -s matching/tools -p "test_*.py"` runs the
+`uv run pytest matching/tools` runs the
 pairing's regression tests on synthetic inputs.
 
 `matching/mac_names.csv` holds hints, kept apart from the proved names in

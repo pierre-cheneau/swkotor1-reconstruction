@@ -6,16 +6,14 @@ The build produces a 32-bit Windows executable. Use a separately purchased GOG W
 
 Install these separately from their official sources:
 
-- [Python for Windows](https://www.python.org/downloads/windows/). The local checks use Python 3.13.5.
+- [uv](https://docs.astral.sh/uv/getting-started/installation/), which runs the Python tooling in a project environment with Python 3.13.
 - [Visual Studio 2022 C++ Build Tools](https://aka.ms/vs/17/release/vs_buildtools.exe), with the Desktop development with C++ components, MSVC v143 14.44 and [Windows SDK](https://learn.microsoft.com/en-us/windows/apps/windows-sdk/) 10.0.26100.0. The script selects these versions explicitly; newer defaults alone are insufficient.
 - [LLVM 23.1.2](https://github.com/llvm/llvm-project/releases/tag/llvmorg-23.1.2), using the `clang+llvm-23.1.2-x86_64-pc-windows-msvc` distribution. Pass its `bin\clang-cl.exe` path. The runner checks version 23.1.2 and LLVM revision `85ac560262434c9ccfc0c183ec22d4138ed647fb`.
-- [pefile 2024.8.26](https://pypi.org/project/pefile/2024.8.26/) in the Python environment used to run the build:
+- [pefile 2024.8.26](https://pypi.org/project/pefile/2024.8.26/), and [Capstone 5.0.7](https://pypi.org/project/capstone/5.0.7/) for the c67 local math generator, which decodes the supported executable. From the checkout root, `uv sync` installs both, at the versions `uv.lock` pins, into `.venv`:
 
 ```powershell
-python -m pip install pefile==2024.8.26 capstone==5.0.7
+uv sync
 ```
-
-The c67 local math generator also requires [Capstone 5.0.7](https://pypi.org/project/capstone/5.0.7/) to decode the supported executable.
 
 Toolchains and Python packages retain their own licenses. The build does not download or install them, or download game files.
 
@@ -44,7 +42,7 @@ Generation reads only the hash-validated installation and writes into the fresh 
 Run from the checkout root in PowerShell. Replace the example paths with your installation and toolchain locations. Choose a new output directory outside both the checkout and the game installation; an existing output directory is rejected.
 
 ```powershell
-python .\build.py --target game --game-dir "D:\Games\Star Wars - KotOR" --clang-cl "C:\Tools\LLVM-23.1.2\bin\clang-cl.exe" --out "D:\KotorBuilds\game-01" --jobs 4
+uv run .\build.py --target game --game-dir "D:\Games\Star Wars - KotOR" --clang-cl "C:\Tools\LLVM-23.1.2\bin\clang-cl.exe" --out "D:\KotorBuilds\game-01" --jobs 4
 ```
 
 If Build Tools is installed elsewhere, add `--vs-root "C:\Path\To\VisualStudio2022\BuildTools"`. `--jobs` accepts 1 through 16. The script configures the x86 compiler environment itself.
@@ -111,7 +109,7 @@ The `LIPS` alias points to the copied lip-animation resources; missing resources
 From the source checkout, create the required empty runtime directories:
 
 ```powershell
-python .\build.py --prepare-runtime $runtimeDir --game-dir "D:\Games\Star Wars - KotOR"
+uv run .\build.py --prepare-runtime $runtimeDir --game-dir "D:\Games\Star Wars - KotOR"
 ```
 
 This setup command creates `Override`, `Temp`, `Logs`, `LocalVault`, `DMVault`, `ServerVault`, `Tempclient`, `saves`, `currentgame` and `gameinprogress`. It is safe to repeat: existing directories and their contents are preserved. It rejects source/install destinations and linked runtime subdirectories. It does not copy assets, change the INI, build, or launch the game. Use the relative aliases shown above.

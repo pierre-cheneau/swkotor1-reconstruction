@@ -1,0 +1,28 @@
+name: Tooling
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    # The build golden records Windows command lines, as build.py runs only there.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # the tracker test compares status.csv with its history
+      - uses: astral-sh/setup-uv@v6
+      - name: Install the locked environment
+        run: uv sync --locked
+      - name: Lint
+        run: uv run ruff check
+      - name: Source pins match the manifest
+        run: uv run pin_sources.py --check
+      - name: Tests
+        run: uv run pytest -q
