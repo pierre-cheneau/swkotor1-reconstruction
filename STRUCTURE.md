@@ -14,7 +14,7 @@ that check each other:
 
 Today the modern-toolchain build covers 97.5% of the 9,252 functions and
 builds the full game:
-- 7,336 have their own definition, 9 of them byte-identical matched code (phase 2)
+- 7,339 have their own definition, 12 of them byte-identical matched code (phase 2)
 - 1,421 are folded into other functions
 - 264 C runtime functions come from VS2022's library
 
@@ -42,6 +42,7 @@ through git history.
 src/, build.py, build-manifest.json, local_generators/   playable build (unchanged)
 pin_sources.py            refresh the source hashes build-manifest.json pins
 bridge_sources.py         generate src/bridge/ (matched code in the playable build) from src/bridge/bridge.json
+cpp_scope.py              namespace-scope C++ declarations, for binding names across units
 tests/                    tooling tests and golden outputs, on synthetic game files only
 matching/
   src/<bucket>/*.cpp        matched sources; buckets are address ranges, see below
@@ -115,8 +116,29 @@ serves. The tool writes one unit per matched file into `src/bridge/`:
   classes as `void*` like the rest of the playable build;
 - forwards for the callees the spec names: the member is defined by calling
   the playable build's entry for that address, after checking its parameter
-  count and return against the original's signature. Any other function or
-  global the slice uses stays unresolved and fails the link.
+  count and return against the original's signature;
+- a data bridge for the globals the slice uses, below.
+
+Any other function or global the slice uses stays unresolved and fails the
+link.
+
+The data bridge binds a matched global to the playable build's storage for the
+same original address. `symbols.csv` gives the global's address.
+`cpp_scope.py` reads the pinned playable sources for the one external,
+non-reference variable named after that address, with a type spelled in
+builtin or `<cstdint>` types. The generator rewrites the matched `extern`
+declaration as a reference to that storage. The reference is cast without a
+function call, so it is initialized statically. A `static_assert` beside it
+checks the storage is large enough. The link then checks the identity: MSVC
+encodes namespace and type into the symbol name.
+
+Read-only data (`.rdata`) the playable build keeps only in unit-local
+constants is copied instead, and only when every playable definition of the
+address agrees on its literal value. Vtables are globals too: a bridged
+constructor or destructor re-points the object at the playable build's table
+for the class's original vftable address. Its entry asserts the class is
+polymorphic, or, without a table, that it is not. Each generated unit lists
+what it bound and what it could not, with the reason.
 
 The tool also keeps the manifest's bridge units and pins in step.
 `--check` and a test fail if anything is out of date. The playable site then
@@ -124,23 +146,35 @@ calls the entry instead of its own copy of the logic. The tracker counts
 the entries as definitions and ignores the addresses that the inlined
 matched code mentions.
 
-The first nine functions replace native port bodies whose logic was the
-callee's, inline:
+Twelve functions replace native port bodies whose logic was the callee's,
+inline:
 - `CResRef::GetLength`, `CSWSCreature::SetFlag288Bit3`
-- `CSWRoomSurfaceMesh::GetAdjacentSecond`, `CSWInventory::GetItemSlotPtr`
+- `CSWRoomSurfaceMesh::GetAdjacentSecond`
+- `CSWInventory::GetItemSlotPtr` and its constructor, bound to the playable
+  inventory vtable
 - `CExoInput::GetLastSetMouseDownState`
 - `CClientExoApp::GetPlayModulePanel`, `EmptyHitcheckIgnoreList`,
   `GetPlayerCharacterSet` and `GetLoadFromIFO`
+- `CServerExoAppInternal::FUN_004b4030`, through `g_pAppManager`
+- `CServerExoAppInternal::GetItemByGameObjectID`, with two agreed constants
 
 A differential emulation agreed with the original on every trial. It ran each
 original function and its rebuilt entry on identical random memory and
-compared return values, memory writes, stack cleanup and forwarded calls.
-They still need play-testing.
+compared:
+- return values, memory writes and stack cleanup;
+- globals, with each one's value set at both programs' addresses;
+- calls to stubbed callees;
+- vtable pointers, normalized between the two programs.
+
+Negative controls fail as they should: a swapped function, a global bound to
+the wrong variable, and an unnormalized vtable. The functions still need
+play-testing.
+
+The data bridge refuses unsound bindings rather than guessing. `AurSetFog`
+writes `g_vFogColor[3]` as one array, but the playable build keeps those
+three floats as separate variables, so it stays unbridged.
 
 Still open:
-- Globals have to map to the playable build's data by address (a data
-  bridge). Until then, functions that read globals or write vtables (such as
-  polymorphic constructors and destructors) are not bridged.
 - Callees that exist in the playable build only inside port helpers,
   without a native entry, need one before a caller can be bridged.
 - Sites where the callee's logic is inline in `derived/` code need a port

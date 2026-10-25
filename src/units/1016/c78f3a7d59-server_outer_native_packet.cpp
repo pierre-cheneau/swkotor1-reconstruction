@@ -6,7 +6,6 @@
 #if !defined(_M_IX86)
 #error Native outer constructor bridge requires x86
 #endif
-namespace kotor_menu_window_cells {extern void* volatile manager_007a39fc;}
 extern "C" {
 unsigned __fastcall recovered_server_packet_004b15d0(void*,void*,unsigned,void*,unsigned,unsigned);
 void __fastcall recovered_server_event_004b78f0(void*,void*,unsigned,unsigned,unsigned);
@@ -23,6 +22,7 @@ void __fastcall kotor_fastcall_004015a0(void*,void*); // 004015A0: plain RET (vt
 // gfxapply: the remaining four 00744184 slots (6..9) bind existing real bodies.
 void* __fastcall recovered_server_get_module_004b14f0(void*,void*);                 // CServerExoAppInternal::GetModule (w1_native_b7)
 void __fastcall game_object_void_return_4_0060e760(void*,void*,std::uint32_t);     // 0060E760 `ret 4` (0797)
+int __fastcall kotor_fastcall_004b4030(void*,void*);                                // CServerExoAppInternal::FUN_004b4030 (src/bridge)
 }
 namespace kotor_client_exo_app { unsigned __stdcall client_get_application_id_005ed990(); }  // 005ED990 (0580): [[007A39FC]+18h], ECX unused
 namespace {
@@ -30,7 +30,7 @@ using namespace recovered_server_create;
 void __fastcall slot_004ae870(void* self,void*,unsigned a,unsigned b,unsigned c){void* inner;std::memcpy(&inner,static_cast<unsigned char*>(self)+4,4);recovered_server_event_004b78f0(inner,nullptr,a,b,c);}
 unsigned __fastcall slot_004ae840(void* self,void*,unsigned id,void* packet,unsigned length,unsigned flags){void* inner;std::memcpy(&inner,static_cast<unsigned char*>(self)+4,4);return recovered_server_packet_004b15d0(inner,nullptr,id,packet,length,flags);}
 float __fastcall slot_004aec60(void*,void*){return 100.0f;}
-unsigned __fastcall slot_004ae880(void*,void*){void* state;void* app=kotor_menu_window_cells::manager_007a39fc;std::memcpy(&state,static_cast<unsigned char*>(app)+0x14,4);unsigned mode;std::memcpy(&mode,state,4);return mode==1;}
+unsigned __fastcall slot_004ae880(void* self,void*){void* inner;std::memcpy(&inner,static_cast<unsigned char*>(self)+4,4);return static_cast<unsigned>(kotor_fastcall_004b4030(inner,nullptr));}
 void* __fastcall slot_004aeda0(void* self,void*){return network_getter_004aeda0(self);}
 using Entry=void (__fastcall*)(void*,void*);
 using EventEntry=void (__fastcall*)(void*,void*,unsigned,unsigned,unsigned);

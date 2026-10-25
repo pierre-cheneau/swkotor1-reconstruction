@@ -150,15 +150,175 @@ def test_only_matched_functions_are_bridged(tmp_path: Path, monkeypatch) -> None
         bridge.generate()
 
 
+def tables(signatures=None, globals_=None, vftables=None) -> bridge.Tables:
+    return bridge.Tables({}, signatures or {}, globals_ or {}, vftables or {})
+
+
+def unit(tables_: bridge.Tables, data: bridge.PlayableData) -> bridge.Unit:
+    return bridge.Unit(Path("x.cpp"), [], [], tables_, data)
+
+
 def test_forwards_must_match_the_playable_signature(monkeypatch) -> None:
-    signatures = {0x004BA820: {"public: int __thiscall CServerExoAppInternal::ExecuteLoadModule(class CExoString &)"}}
-    monkeypatch.setattr(bridge, "playable_entry", lambda name: (3, False))       # src/ declares it void
+    load = "public: int __thiscall CServerExoAppInternal::ExecuteLoadModule(class CExoString &)"
+    u = unit(tables({0x004BA820: {load}}), bridge.PlayableData([]))
+    monkeypatch.setattr(bridge, "playable_entry", lambda name, data: (3, False))     # src/ declares it void
     with pytest.raises(ValueError, match="does not have the original's signature"):
-        bridge.forward(0x004BA820, signatures)
-    monkeypatch.setattr(bridge, "playable_entry", lambda name: (3, True))
-    assert bridge.forward(0x004BA820, signatures).entry == "kotor_fastcall_004ba820"
+        u.forward(0x004BA820, "")
+    monkeypatch.setattr(bridge, "playable_entry", lambda name, data: (3, True))
+    assert u.forward(0x004BA820, "").entry == "kotor_fastcall_004ba820"
 
 
-def test_an_address_needs_exactly_one_signature() -> None:
-    with pytest.raises(ValueError, match="2 signatures"):
-        bridge.signature(0x00401000, {0x00401000: {"a", "b"}})
+def test_several_signatures_resolve_to_the_one_the_slice_declares() -> None:
+    signed = "public: char __thiscall CGameObjectArray::GetGameObject(unsigned long,class CGameObject * *)"
+    plain_ = "public: unsigned char __thiscall CGameObjectArray::GetGameObject(unsigned long,class CGameObject * *)"
+    t = tables({0x004D8230: {signed, plain_}})
+    body = ("class CGameObjectArray {\npublic:\n"
+            "    unsigned char GetGameObject(unsigned long id, CGameObject** out);\n};")
+    assert t.signature(0x004D8230, body) == plain_
+    with pytest.raises(ValueError, match="2 matching signatures"):
+        t.signature(0x004D8230)
+    with pytest.raises(ValueError, match="0 matching signatures"):
+        t.signature(0x004D8230, "class CGameObjectArray {};")
+
+
+# ---------------------------------------------------------------- constructors, destructors and vtables
+
+def test_constructors_and_destructors_are_recognized() -> None:
+    ctor = function("public: __thiscall CSWInventory::CSWInventory(void)", 0x005A4930)
+    dtor = function("public: virtual __thiscall CAurPart::~CAurPart(void)", 0x0043E2E0)
+    member = function(TYPICAL)
+    assert (ctor.kind, ctor.returns, dtor.kind, dtor.returns, member.kind) == (
+        "constructor", "void*", "destructor", "void", "member")
+    with pytest.raises(ValueError, match="unexpected signature shape"):
+        function("public: int __thiscall CSWInventory::CSWInventory(void)")
+
+
+def test_a_bound_constructor_rebinds_the_vtable_and_returns_this() -> None:
+    entry = function("public: __thiscall CSWInventory::CSWInventory(void)", 0x005A4930).entry_definition(
+        "::kotor_vtable_cswinventory_0074a824")
+    assert entry.splitlines()[2:6] == [
+        '    static_assert(std::is_polymorphic<CSWInventory>::value, "a vtable is bound");',
+        "    ::new (self) CSWInventory();",
+        "    *static_cast<const void**>(self) = static_cast<const void*>(::kotor_vtable_cswinventory_0074a824);"
+        "  // the playable build's table",
+        "    return self;"]
+
+
+def test_an_unbound_destructor_insists_the_class_has_no_vtable() -> None:
+    entry = function("public: __thiscall CThing::~CThing(void)", 0x00401000).entry_definition()
+    assert "static_assert(!std::is_polymorphic<CThing>::value" in entry
+    assert "static_cast<CThing*>(self)->CThing::~CThing();" in entry and "return" not in entry
+
+
+def test_compiler_generated_markers_own_only_their_line() -> None:
+    text = ("// FUNCTION: SWKOTOR 0x005A4C00 SYMBOL: ??_GCSWInventory@@UAEPAXI@Z\n\n"
+            "// FUNCTION: SWKOTOR 0x005A4C20\nint GetItemInSlot() { return 1; }\n")
+    assert bridge.select(text, {0x005A4C20}) == (text[text.index("\n") + 1:], {0x005A4C20})   # all but the marker
+    assert "GetItemInSlot" not in bridge.select(text, set())[0]
+    with pytest.raises(ValueError, match="compiler-generated"):
+        bridge.select(text, {0x005A4C00})
+
+
+# ---------------------------------------------------------------- the data bridge
+
+@pytest.mark.parametrize(("text", "value"), [
+    ("0", 0), ("0x00u", 0), ("6", 6), ("{0}", 0), ("-3", -3), ("010", 8), ("0x10UL", 16),
+    ("1.5f", 1.5), ("0x1p+0f", 1.0), (".5", 0.5), ("nullptr", None), ("kOther", None), ("1 + 1", None),
+])
+def test_literal_values(text, value) -> None:
+    assert bridge.literal(text) == value
+
+
+@pytest.mark.parametrize(("type_", "bounds", "size"), [
+    ("void* volatile", "", 4), ("std::uint32_t volatile", "", 4), ("const unsigned char", "", 1), ("float", "[3]", 12),
+    ("CAppManager*", "", 4), ("unsigned", "", 4), ("double", "[2][2]", 32), ("CExoString", "", None),
+    ("float", "[]", None), ("long long", "", None),
+])
+def test_sizes(type_, bounds, size) -> None:
+    assert bridge.size_of(type_, bounds) == size
+
+
+PLAYABLE = {
+    "cells.cpp": "namespace kotor_menu_window_cells {\nvoid* volatile manager_007a39fc = nullptr;\n"
+                 "volatile float fog_0078db24 = 1.0f;\n}\n",
+    "alias.cpp": "namespace other { void*& app_007a39fc = kotor_menu_window_cells::manager_007a39fc; }\n"
+                 "namespace kotor_menu_window_cells { extern void* volatile manager_007a39fc; }\n",
+    "constants_a.cpp": "namespace { constexpr unsigned char k_found_0074666c = 0x00u; }\n"
+                       "constexpr unsigned k_mixed_00746640 = 1;\n",
+    "constants_b.cpp": "const unsigned char kOk_0074666c = 0;\nconstexpr unsigned k_mixed_00746640 = 2;\n",
+    "twice_a.cpp": "unsigned word_00831fdc = 0;\n",
+    "twice_b.cpp": 'extern "C" { void* recovered_00831fdc = nullptr; }\n',
+    "window.cpp": "HWND volatile render_007a39d8 = nullptr;\n",
+    "table.cpp": 'extern "C" const void* const kotor_vtable_cswinventory_0074a824[] = {nullptr};\n',
+}
+
+
+@pytest.fixture
+def playable(tmp_path: Path) -> bridge.PlayableData:
+    for name, text in PLAYABLE.items():
+        (tmp_path / name).write_text(text, encoding="utf-8")
+    return bridge.PlayableData(sorted(tmp_path.glob("*.cpp")))
+
+
+def test_storage_is_the_one_external_definition(playable) -> None:
+    storage = playable.storage(0x007A39FC)
+    assert storage.qualified == "::kotor_menu_window_cells::manager_007a39fc" and storage.size == 4
+    assert storage.declaration() == "namespace kotor_menu_window_cells { extern void* volatile manager_007a39fc; }"
+    table = playable.storage(0x0074A824)
+    assert table.declaration() == 'extern "C" const void* const kotor_vtable_cswinventory_0074a824[];'
+    assert table.qualified == "::kotor_vtable_cswinventory_0074a824"
+
+
+@pytest.mark.parametrize(("address", "reason"), [
+    (0x00831FDC, "2 external playable definitions: ::recovered_00831fdc, ::word_00831fdc"),
+    (0x0074666C, "0 external playable definitions (2 internal)"),
+    (0x007A39D8, "unsupported playable type HWND volatile"),
+    (0x00700000, "0 external playable definitions"),
+])
+def test_storage_refusals_say_why(playable, address, reason) -> None:
+    assert playable.storage(address) == reason
+
+
+def test_constants_need_every_definition_to_agree(playable) -> None:
+    assert playable.constant(0x0074666C) == ("0", 2)
+    assert playable.constant(0x00746640) is None          # 1 and 2 disagree
+    assert playable.constant(0x007A39FC) is None          # nullptr is not a literal
+
+
+MATCHED_GLOBALS = """\
+class CAppManager;
+extern CAppManager* g_pAppManager;                  // 0x007A39FC
+extern float g_vFogColor[3];
+extern const unsigned char GAME_OBJECT_VALID;
+extern int g_unused;
+extern HWND g_window;
+int use() { return g_pAppManager != 0 && g_vFogColor[0] > 0 && GAME_OBJECT_VALID == 0 && g_window != 0; }
+"""
+
+
+def test_used_globals_bind_to_storage_or_agreed_constants(playable) -> None:
+    t = tables(globals_={"g_pAppManager": {0x007A39FC}, "g_vFogColor": {0x0078DB24}, "GAME_OBJECT_VALID": {0x0074666C},
+                         "g_unused": {0x00700000}, "g_window": {0x007A39D8, 0x007A39DC}})
+    body, bound, unbound = unit(t, playable).bind_globals(MATCHED_GLOBALS)
+    assert [(name, type(target).__name__) for name, target in bound] == [
+        ("g_pAppManager", "Storage"), ("GAME_OBJECT_VALID", "Constant")]
+    assert unbound == [
+        ("g_vFogColor", "0078DB24: 12 bytes, the playable ::kotor_menu_window_cells::fog_0078db24 holds 4"),
+        ("g_window", "2 original addresses in symbols.csv")]
+    assert "kotor_bridge::ref<CAppManager*> g_pAppManager = reinterpret_cast<kotor_bridge::ref<CAppManager*>>" \
+           "(const_cast<kotor_bridge::storage<decltype(::kotor_menu_window_cells::manager_007a39fc)>&>" \
+           "(::kotor_menu_window_cells::manager_007a39fc));                  // 0x007A39FC" in body
+    assert 'static_assert(sizeof(CAppManager*) <= sizeof(::kotor_menu_window_cells::manager_007a39fc)' in body
+    assert "const unsigned char GAME_OBJECT_VALID = 0;" in body
+    assert "extern int g_unused;" in body and "extern float g_vFogColor[3];" in body     # untouched
+
+
+def test_a_class_with_several_vftables_is_refused(playable) -> None:
+    ctor = function("public: __thiscall CBoth::CBoth(void)", 0x00401000)
+    t = tables(vftables={"CBoth": {0x00741000, 0x00741010}})
+    with pytest.raises(ValueError, match="several vftables"):
+        unit(t, playable).vtable(ctor)
+    with pytest.raises(ValueError, match="no playable table"):
+        unit(tables(vftables={"CBoth": {0x00741000}}), playable).vtable(ctor)
+    assert unit(tables(vftables={"CBoth": {0x0074A824}}), playable).vtable(ctor).variable.name == \
+        "kotor_vtable_cswinventory_0074a824"
