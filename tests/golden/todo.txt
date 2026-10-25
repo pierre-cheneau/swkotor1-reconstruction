@@ -1,0 +1,234 @@
+### todo.py -n 40
+3,087 functions; showing 40
+0x004A0030      16 B  todo           src/units/0658/c5aa34659e-behavior_tables.cpp
+0x004A23B0      16 B  todo           src/units/1470/5ac096f97b-scene3d.cpp
+0x004A28A0      16 B  todo           src/units/0093/7fc6bb6508-construct3d.cpp
+0x004A6470      16 B  todo           src/units/0680/df8b0bc204-emitter_core.cpp
+0x004A67A0      16 B  todo           src/units/1381/0e2b88478d-w3_client_aurora.cpp
+0x004B6CB0      16 B  todo           src/units/1714/0e6a6e4c35-claude_p2s_b_charlist.cpp
+0x00504860      16 B  todo           -
+0x00506F10      16 B  todo           -
+0x005EC200      16 B  todo           src/units/0267/b685a5f46a-os_imports.cpp
+0x005F1400      16 B  todo           src/units/0198/98db7b5ee9-case95_pair.cpp
+0x00604790      16 B  todo           src/units/0230/759adc749c-providers.cpp
+0x0061F7C0      16 B  todo           -
+0x0061F7D0      16 B  todo           src/units/0948/8e3e398acb-query_exit.cpp
+0x00624AE0      16 B  todo           -
+0x0062A9E0      16 B  todo           src/units/1695/470703b884-claude_w1_chains_autosave.cpp
+0x0062A9F0      16 B  todo           src/units/1695/470703b884-claude_w1_chains_autosave.cpp
+0x0062B0A0      16 B  todo           src/units/0983/acc184613e-opt_feedback.cpp
+0x0062B0F0      16 B  todo           src/units/1619/e2c20a05a0-change_character_0062b0f0.cpp
+0x0062B100      16 B  todo           src/units/1745/88af335ade-claude_gui_hud2.cpp
+0x006383B0      16 B  todo           src/units/0085/6685a1e155-w5_player_control.cpp
+0x006386D0      16 B  todo           src/units/1592/2e96f1e3e4-camera_navigate.cpp
+0x0063C060      16 B  todo           src/derived/0817-m15a-object/892b7aa1183702a1_m15a_object.cpp
+0x0063CE30      16 B  todo           src/units/0054/331e73dbb9-object_vfx_render_lowers.cpp
+0x0063D460      16 B  todo           src/units/0054/331e73dbb9-object_vfx_render_lowers.cpp
+0x0063D520      16 B  todo           src/units/1536/5a47792f2b-claude_0963_bodies.inc
+0x0063D530      16 B  todo           src/units/1536/5a47792f2b-claude_0963_bodies.inc
+0x0063D540      16 B  todo           -
+0x0063D550      16 B  todo           -
+0x0063D820      16 B  todo           src/units/1472/f2233c5277-m15e_creature.cpp
+0x0063E7F0      16 B  todo           src/generated/0520/a1976ededb-texture_cells.cpp
+0x00644760      16 B  todo           src/units/0015/5b8cceb8c7-packed_file.cpp
+0x00644770      16 B  todo           src/units/1746/09fd1e4f10-claude_gui_journal.cpp
+0x00644780      16 B  todo           src/units/1746/09fd1e4f10-claude_gui_journal.cpp
+0x00644A30      16 B  todo           src/units/1403/15b21016d2-panels_character.cpp
+0x006460B0      16 B  todo           src/units/1380/b9d6defe86-w3_client_area.cpp
+0x00647720      16 B  todo           src/derived/0819-m15b-stats/cef58a4410165453_m15b_stats.cpp
+0x00647A80      16 B  todo           src/derived/0859-save-chargen-stats_read/e37cf945e90708bb_stats_read.cpp
+0x0064B530      16 B  todo           src/units/0780/2cfa58a847-sw_message.cpp
+0x00675DB0      16 B  todo           src/units/1742/cf6ac202ae-claude_s2p_small_journal2.cpp
+0x00675DC0      16 B  todo           src/units/1742/cf6ac202ae-claude_s2p_small_journal2.cpp
+### todo.py --near -n 40
+504 functions; showing 40
+0x005F5C70      64 B  NONMATCH 0     -
+0x005F5CB0      64 B  NONMATCH 0     -
+0x004CC790      80 B  NONMATCH 0     src/units/1764/7a5be055c8-claude_effects_g3_a.cpp
+0x005EC9C0      96 B  NONMATCH 0     src/units/0460/e6fca0e4c5-locstring.cpp
+0x00407020     128 B  NONMATCH 0     src/units/0415/2d96b2e321-status-deallocator.cpp
+0x005D6CD0      16 B  NONMATCH 1     -
+0x005EC560      64 B  NONMATCH 1     src/derived/0848-debug_timestamp/6e3c0c32fb6bbf5b_debug_timestamp.cpp
+0x00406540      96 B  NONMATCH 1     src/units/0423/aec5cf4172-free-resource-data.cpp
+0x0041E9C0      96 B  NONMATCH 1     src/units/0755/1b07f8fc2e-texture_scheduler_lowers.cpp
+0x00508960     112 B  NONMATCH 1     src/units/0050/0efea7c815-trap_limit.cpp
+0x0064E730     128 B  NONMATCH 1     -
+0x00411E10     176 B  NONMATCH 1     src/units/0486/d02128a9e3-gff_readers.cpp
+0x00412380     208 B  NONMATCH 1     src/derived/0891-gff_extra_readers/9ec3d7a7e602d339_gff_extra_readers.cpp
+0x0056B880     208 B  NONMATCH 1     src/units/0175/51a38e30aa-w2_g07_playerlast.cpp
+0x005EC700     240 B  NONMATCH 1     src/units/0460/e6fca0e4c5-locstring.cpp
+0x00523B20     256 B  NONMATCH 1     src/units/1707/a812595a47-claude_p2s_a_inv.cpp
+0x0064A770     256 B  NONMATCH 1     -
+0x00418670      16 B  NONMATCH 2     src/derived/0823-m15c-editbox/bca195141e977bf9_m15c_editbox.cpp
+0x005DB450      48 B  NONMATCH 2     -
+0x00410560      64 B  NONMATCH 2     -
+0x004CCD30      80 B  NONMATCH 2     src/units/1766/e0bfb48b22-claude_effects_g3_damage.cpp
+0x005C95A0      80 B  NONMATCH 2     src/derived/0905-area_allocations/787a4bdc44c1ab30_area_allocations.cpp
+0x0040DA20     128 B  NONMATCH 2     src/units/0015/5b8cceb8c7-packed_file.cpp
+0x0062B150     144 B  NONMATCH 2     src/units/1767/d301e1ec60-claude_effects_g3_death.cpp
+0x004F1250     192 B  NONMATCH 2     src/units/1690/348d8cc11b-claude_w1_route_bodies.cpp
+0x00482BF0     304 B  NONMATCH 2     src/units/0676/172e4dbd38-anim_controllers.cpp
+0x006851B0     384 B  NONMATCH 2     src/units/1575/25c1b73d7d-hud_conditional_adjust.cpp
+0x004DCAC0     464 B  NONMATCH 2     src/units/1761/64179a8cb4-claude_effects_g2.cpp
+0x004640F0      32 B  NONMATCH 3     -
+0x004B1DC0      48 B  NONMATCH 3     src/units/0643/ccd9ba3918-server_pause.cpp
+0x004D6440      64 B  NONMATCH 3     src/derived/0898-module_message/688c96cc91c7de4c_module_message.cpp
+0x00440410      80 B  NONMATCH 3     src/units/0665/b313627324-model_instance.cpp
+0x00506A10      80 B  NONMATCH 3     src/units/1773/a5ee322d90-claude_vm_vmd_c.cpp
+0x0040D500      96 B  NONMATCH 3     src/units/0289/7a83145518-key_hash.cpp
+0x005AB980      96 B  NONMATCH 3     src/units/1566/82127bd177-talent_lowers.cpp
+0x0066C870      96 B  NONMATCH 3     src/units/1812/bc2ae2caa2-claude_gui_char_minigame.cpp
+0x006706E0     112 B  NONMATCH 3     -
+0x0045E710     128 B  NONMATCH 3     src/units/0513/9b233fbd75-controller_perlin_arturo.cpp
+0x006AAC10     128 B  NONMATCH 3     src/units/1649/799554ab23-claude_menu_handlers_a.cpp
+0x006AAC90     128 B  NONMATCH 3     src/units/1649/799554ab23-claude_menu_handlers_a.cpp
+### todo.py --largest -n 25
+3,087 functions; showing 25
+0x00656D20  50,336 B  todo           src/units/1728/a20fe46907-claude_s2p_cc.cpp
+0x005FCD10  22,848 B  todo           src/units/1506/bf959573a3-feedback_main.cpp
+0x0042E600  13,040 B  todo           src/units/0792/98c62c8484-enable_combiners.cpp
+0x005972B0  11,296 B  todo           src/units/0713/08d7d41209-collision_mesh.cpp
+0x00471560  10,560 B  todo           src/units/1470/5ac096f97b-scene3d.cpp
+0x0055A510  10,176 B  todo           src/units/1652/c12db6b9cf-claude_equip_items2.cpp
+0x004658B0  10,160 B  todo           src/units/0942/a8faaf4004-mdl_parse_emitter.cpp
+0x006655E0   9,952 B  todo           src/units/1659/bcab572e98-claude_w3_update.cpp
+0x00498B80   9,904 B  todo           src/units/1438/9e871a7e41-f4_lightning.cpp
+0x0048A520   8,496 B  todo           src/units/0702/49081e5bdb-vp_f2_skinned.cpp
+0x0054C960   8,304 B  todo           src/derived/0852-vm_commands/4b03df5ef2f7b49b_vm_commands.cpp
+0x005EEB10   8,128 B  todo           -
+0x006288F0   8,128 B  todo           src/units/1680/971ff75ce6-claude_dialogue_camera.cpp
+0x004F3FE0   8,080 B  todo           src/derived/0976-creature_effect_ability/7285a4901fc4c809_creature_effect_ability.cpp
+0x005AFCE0   7,856 B  todo           src/derived/0972-creature_stats_load/fd98bb8cc377bf66_creature_stats_load.cpp
+0x00607610   7,680 B  todo           -
+0x0059BA20   7,584 B  todo           src/generated/rules-input/spell_array.cpp
+0x00536FE0   7,408 B  todo           src/units/0205/c7026f3d03-vm_commands_native_entering.inc
+0x006227E0   7,376 B  todo           src/units/0954/ed62d36f80-process_input.cpp
+0x00663840   7,376 B  todo           -
+0x00520BF0   7,200 B  todo           -
+0x0061DBE0   7,040 B  todo           src/units/0565/a307d55547-client_options_load.cpp
+0x0061B780   6,720 B  todo           src/units/0568/9d58820996-client_options_save.cpp
+0x004299C0   6,576 B  todo           src/units/0706/7e37766efa-fb_pixel_shaders.cpp
+0x00490820   6,576 B  todo           src/units/0711/93b011ea0a-fb_emitter_motion_blur.cpp
+### todo.py --range 0x5E0000 0x620000 -n 50
+246 functions; showing 50
+0x005EC200      16 B  todo           src/units/0267/b685a5f46a-os_imports.cpp
+0x005F1400      16 B  todo           src/units/0198/98db7b5ee9-case95_pair.cpp
+0x00604790      16 B  todo           src/units/0230/759adc749c-providers.cpp
+0x0061F7C0      16 B  todo           -
+0x0061F7D0      16 B  todo           src/units/0948/8e3e398acb-query_exit.cpp
+0x005F2AC0      32 B  todo           src/units/0765/a0ec25c81c-pause_leaves.cpp
+0x005F4100      32 B  todo           src/units/0036/92bc3efc66-interaction.cpp
+0x005F4EA0      32 B  todo           src/units/0880/e402a39bba-gui_m48_controls.cpp
+0x00604B20      32 B  todo           src/units/0230/759adc749c-providers.cpp
+0x00610590      32 B  todo           src/units/0085/6685a1e155-w5_player_control.cpp
+0x0061B6F0      32 B  todo           src/units/0064/8fd128da95-d1_bodies.cpp
+0x0061F940      32 B  todo           src/units/0949/7cc1968498-client_input_frame.cpp
+0x0061F960      32 B  todo           src/units/0949/7cc1968498-client_input_frame.cpp
+0x005F1460      48 B  todo           src/units/1472/f2233c5277-m15e_creature.cpp
+0x005F29F0      48 B  todo           src/units/1738/43eac0b78b-claude_s2p_small_b.cpp
+0x00610E90      48 B  todo           src/units/1472/f2233c5277-m15e_creature.cpp
+0x00614B60      48 B  todo           src/units/1475/f72ef3ddbd-creature_ai.cpp
+0x00616200      48 B  todo           src/units/1556/c3f8d9ac0e-menu_callbacks.cpp
+0x006167D0      48 B  todo           src/units/1725/2fdfbfa706-claude_stale_bodies_client.cpp
+0x0061B710      48 B  todo           src/units/0563/d1b8224b1e-video_mode_settings.cpp
+0x0061F760      48 B  todo           -
+0x0061F790      48 B  todo           src/units/0039/c00b678f72-w5_picking.cpp
+0x005F4A20      64 B  todo           src/units/1412/b232d58bbf-membership.cpp
+0x005F5180      64 B  todo           src/units/0896/50a657a58d-client_sound_engine.cpp
+0x00610550      64 B  todo           src/units/1472/f2233c5277-m15e_creature.cpp
+0x00614630      64 B  todo           src/units/1539/6dfcc3c1c2-creature_misc.cpp
+0x00616900      64 B  todo           src/units/1725/2fdfbfa706-claude_stale_bodies_client.cpp
+0x0061B740      64 B  todo           src/units/0984/ea07d22a18-opt_gameplay.cpp
+0x0061F980      64 B  todo           src/units/0230/759adc749c-providers.cpp
+0x0061F9C0      64 B  todo           src/units/0591/7364cd5690-window_leaves.cpp
+0x005F9AA0      80 B  todo           src/units/1502/7b72706245-m15_dust_models.cpp
+0x00604870      80 B  todo           src/units/0017/cfb4622a56-client_update.cpp
+0x0060F150      80 B  todo           src/units/1472/f2233c5277-m15e_creature.cpp
+0x00610A70      80 B  todo           src/units/1475/f72ef3ddbd-creature_ai.cpp
+0x00617A20      80 B  todo           -
+0x0061F7E0      80 B  todo           -
+0x0061F830      80 B  todo           -
+0x0061FB50      80 B  todo           src/units/0954/ed62d36f80-process_input.cpp
+0x005F1090      96 B  todo           -
+0x00602C90      96 B  todo           -
+0x00604810      96 B  todo           src/units/1472/f2233c5277-m15e_creature.cpp
+0x00610950      96 B  todo           src/units/0129/64e97300de-vm_actions_w1.cpp
+0x006109B0      96 B  todo           src/generated/1542/5c1e6af468-object_vfx_lightsaber.cpp
+0x00610A10      96 B  todo           src/units/1414/8c28d7f93b-selection.cpp
+0x006145D0      96 B  todo           src/units/1472/f2233c5277-m15e_creature.cpp
+0x00616940      96 B  todo           src/derived/1032-effect_insert/b9e637cfb7291456_effect_insert.cpp
+0x00617A70      96 B  todo           src/units/1461/f4c7ba6a63-w3_client_t3.cpp
+0x00619DB0      96 B  todo           src/units/1544/4fd828fd0e-populate_menus.cpp
+0x005F1020     112 B  todo           src/units/0760/0fd7d77eec-shutdown_callees.cpp
+0x005F1B20     112 B  todo           src/units/0845/77fd306f5d-fade.cpp
+### todo.py --address 0x005B2EF0
+== src/generated/rules-input/base_item_array.cpp:25
+// ---- 005B2EF0 CSWBaseItem::CSWBaseItem ----
+// EH states 0..2 (handler 0072232A) cover the four CExoString members; their
+// constructor 005B3190 is two plain stores (005B3190..005B319F) and cannot throw,
+// so the unwind paths are unreachable and no try is emitted.
+void* __fastcall kotor_fastcall_005b2ef0(void* self, void*) {
+    c2da_default_ref_00405ed0(ref_at(self, 0x4C), nullptr);   // 005B2F0A/005B2F11 CResRef()
+    c2da_default_ref_00405ed0(ref_at(self, 0x5C), nullptr);   // 005B2F16/005B2F19
+    ::new (bytes(self) + 0x94) String();                       // 005B2F1E/005B2F24 005B3190
+    ::new (bytes(self) + 0x9C) String();                       // 005B2F2B/005B2F35 (state 0)
+    ::new (bytes(self) + 0xA4) String();                       // 005B2F3A/005B2F45 (state 1)
+    ::new (bytes(self) + 0xBC) String();                       // 005B2F4A/005B2F55 (state 2)
+    wr32(self, 0x04, 0);                                       // 005B2F5A
+    wr8(self, 0x18, 0);                                        // 005B2F5D
+    wr32(self, 0x00, 0xFFFFFFFFu);                             // 005B2F60
+    wr32(self, 0x3C, 0); wr32(self, 0x40, 0); wr32(self, 0x44, 0); // 005B2F68..005B2F70
+    wr32(self, 0x48, 0);                                       // 005B2F77
+    wr8(self, 0x78, 0);                                        // 005B2F7A
+    wr32(self, 0x7C, 0);                                       // 005B2F7D
+    wr8(self, 0x80, 0);                                        // 005B2F80
+    wr8(self, 0x88, 0);                                        // 005B2F86
+    wr16(self, 0xB0, 0);                                       // 005B2F8C
+    wr16(self, 0xB2, 0);                                       // 005B2F93
+    wr32(self, 0xB8, 0);                                       // 005B2F9A
+    wr8(self, 0xAF, 1);                                        // 005B2FA0
+    wr8(self, 0xAD, 0xFF);                                     // 005B2FA7
+    return self;                                               // 005B2FAE mov eax,esi
+}
+### todo.py --names matching/mac_names.csv -n 40
+3,087 functions; showing 40
+0x004A0030      16 B  todo           src/units/0658/c5aa34659e-behavior_tables.cpp  (near aurbehavior.o)
+0x004A23B0      16 B  todo           src/units/1470/5ac096f97b-scene3d.cpp  AurVertexProgramMakeCurrent() [name, 2/2, exact] (aurvertexprog.o)
+0x004A28A0      16 B  todo           src/units/0093/7fc6bb6508-construct3d.cpp
+0x004A6470      16 B  todo           src/units/0680/df8b0bc204-emitter_core.cpp  (near aurwindmanager.o)
+0x004A67A0      16 B  todo           src/units/1381/0e2b88478d-w3_client_aurora.cpp
+0x004B6CB0      16 B  todo           src/units/1714/0e6a6e4c35-claude_p2s_b_charlist.cpp  CServerExoAppInternal::AddCharListRequest(unsigned long) [name, 2/2, exact] (serverexoappinternal.o)
+0x00504860      16 B  todo           -
+0x00506F10      16 B  todo           -  (near nwsarea.o)
+0x005EC200      16 B  todo           src/units/0267/b685a5f46a-os_imports.cpp  CExoTimersInternal::GetLowResolutionTimer() [name, 2/2, exact] (exotimersinternal.o)
+0x005F1400      16 B  todo           src/units/0198/98db7b5ee9-case95_pair.cpp  CClientExoAppInternal::ResetDriveAcceleration() [name, 2/2, exact] (clientexoappinternal.o)
+0x00604790      16 B  todo           src/units/0230/759adc749c-providers.cpp
+0x0061F7C0      16 B  todo           -  CClientExoAppInternal::DisableInput() [name, 2/2, exact] (clientinput.o)
+0x0061F7D0      16 B  todo           src/units/0948/8e3e398acb-query_exit.cpp  CClientExoAppInternal::EnableInput() [name, 2/2, exact] (clientinput.o)
+0x00624AE0      16 B  todo           -  (near swguiingame.o)
+0x0062A9E0      16 B  todo           src/units/1695/470703b884-claude_w1_chains_autosave.cpp  (near guiingame.o)
+0x0062A9F0      16 B  todo           src/units/1695/470703b884-claude_w1_chains_autosave.cpp  (near guiingame.o)
+0x0062B0A0      16 B  todo           src/units/0983/acc184613e-opt_feedback.cpp  CGuiInGame::InitializeMap() [calls1, 2/2] (guiingame.o)
+0x0062B0F0      16 B  todo           src/units/1619/e2c20a05a0-change_character_0062b0f0.cpp  (near guiingame.o)
+0x0062B100      16 B  todo           src/units/1745/88af335ade-claude_gui_hud2.cpp  (near guiingame.o)
+0x006383B0      16 B  todo           src/units/0085/6685a1e155-w5_player_control.cpp  (near swbehaviorcamera.o)
+0x006386D0      16 B  todo           src/units/1592/2e96f1e3e4-camera_navigate.cpp  (near swbehaviorcamera.o)
+0x0063C060      16 B  todo           src/derived/0817-m15a-object/892b7aa1183702a1_m15a_object.cpp  CSWCObject::GetCurrentAnimation() [calls1, 1/2] (nwcobject.o)
+0x0063CE30      16 B  todo           src/units/0054/331e73dbb9-object_vfx_render_lowers.cpp  (near nwcobject.o)
+0x0063D460      16 B  todo           src/units/0054/331e73dbb9-object_vfx_render_lowers.cpp  CSWCObject::RestoreTexture() [name, 2/2, exact] (nwcobject.o)
+0x0063D520      16 B  todo           src/units/1536/5a47792f2b-claude_0963_bodies.inc  CSWCObject::AttachmentFromServerObject(CSWSObject*) [calls1, 2/2] (nwcobject.o)
+0x0063D530      16 B  todo           src/units/1536/5a47792f2b-claude_0963_bodies.inc  CSWCObject::DetachFromServerObject() [calls1, 1/2] (near nwcobject.o)
+0x0063D540      16 B  todo           -  (near nwcobject.o)
+0x0063D550      16 B  todo           -  (near nwcobject.o)
+0x0063D820      16 B  todo           src/units/1472/f2233c5277-m15e_creature.cpp  CSWCObject::AttachToScene(CAurScene*) [vtable, 1/2] (nwcobject.o)
+0x0063E7F0      16 B  todo           src/generated/0520/a1976ededb-texture_cells.cpp  (near nwcobject.o)
+0x00644760      16 B  todo           src/units/0015/5b8cceb8c7-packed_file.cpp  CExoPackedFile::GetAsyncFile() [vtable, 2/2] (exoresfile.o)
+0x00644770      16 B  todo           src/units/1746/09fd1e4f10-claude_gui_journal.cpp
+0x00644780      16 B  todo           src/units/1746/09fd1e4f10-claude_gui_journal.cpp
+0x00644A30      16 B  todo           src/units/1403/15b21016d2-panels_character.cpp
+0x006460B0      16 B  todo           src/units/1380/b9d6defe86-w3_client_area.cpp
+0x00647720      16 B  todo           src/derived/0819-m15b-stats/cef58a4410165453_m15b_stats.cpp  CSWCCreatureStats::GetArmorClass(int) [calls1, 1/2] (near nwccreaturestats.o)
+0x00647A80      16 B  todo           src/derived/0859-save-chargen-stats_read/e37cf945e90708bb_stats_read.cpp  CSWCCreatureStats::GetMaxHitPoints() [name, 2/2, exact] (nwccreaturestats.o)
+0x0064B530      16 B  todo           src/units/0780/2cfa58a847-sw_message.cpp  CSWCMessage::~CSWCMessage() [name, 2/2, exact] (nwchandlemessage.o)
+0x00675DB0      16 B  todo           src/units/1742/cf6ac202ae-claude_s2p_small_journal2.cpp
+0x00675DC0      16 B  todo           src/units/1742/cf6ac202ae-claude_s2p_small_journal2.cpp

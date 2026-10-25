@@ -16,3 +16,8 @@ dev = [
 
 [tool.uv]
 package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "matching/tools"]
+pythonpath = ["tests"]
+addopts = "-p no:cacheprovider"
