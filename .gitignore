@@ -23,3 +23,8 @@ kotor_generated/
 kotor_vc7_math.asm
 kotor_vc7_pow_tables.inc
 l1_layout.json
+
+# Python tooling environment (uv)
+.venv/
+.pytest_cache/
+.ruff_cache/

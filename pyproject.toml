@@ -1,0 +1,18 @@
+[project]
+name = "swkotor1-reconstruction-tools"
+version = "0.1.0"
+description = "Build, generation and matching tools for the swkotor.exe reconstruction"
+requires-python = ">=3.13"
+dependencies = [
+    "pefile==2024.8.26",
+    "capstone==5.0.7",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.8",
+]
+
+[tool.uv]
+package = false
