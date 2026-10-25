@@ -90,6 +90,7 @@ class Toolchain:
 def load_build(build_root: Path):
     spec = importlib.util.spec_from_file_location("build_under_test", build_root / "build.py")
     module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module           # dataclasses resolve their module here
     sys.path.insert(0, str(build_root))
     for name in [m for m in sys.modules if m == "local_math" or m.startswith("local_math.")]:
         del sys.modules[name]

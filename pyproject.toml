@@ -19,5 +19,5 @@ package = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "matching/tools"]
-pythonpath = ["tests"]
+pythonpath = [".", "tests"]
 addopts = "-p no:cacheprovider"
