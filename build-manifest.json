@@ -39600,6 +39600,114 @@
             "/clang:-ffp-contract=off",
             "/showIncludes"
           ]
+        },
+        {
+          "source": "src/bridge/a_sws_creature_broadcast.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/c_client_exo_app.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/d_res_ref.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/f_inventory.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/f_surfmesh.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/j_exo_input.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
         }
       ],
       "files": [
@@ -39857,7 +39965,7 @@
         },
         {
           "path": "src/units/0007/31d1a4213d-client_status_native.cpp",
-          "sha256": "ccd259c683601ccc4157c79eee5bd3bc0d3937b53dc602e3d2eabc4aa41a7c58"
+          "sha256": "d635871fb77427f826afd3063959803c9ce44a4f3d96097e6b62d62fb3044dd0"
         },
         {
           "path": "src/units/0007/814d0b39ed-player_message.hpp",
@@ -40149,7 +40257,7 @@
         },
         {
           "path": "src/units/0016/9b438f14aa-w3_client_area_load.cpp",
-          "sha256": "21dadcd47c61ed7064aecc2ae6787741cd9d3e367638ca17dea52b5ed2f7d6a3"
+          "sha256": "e7aa4a69be8dde7ea134552c22edae2d86875e4d15bfaacdf87dcd396ab3fc17"
         },
         {
           "path": "src/units/0016/c39a01a95c-w3_client_area.h",
@@ -40181,7 +40289,7 @@
         },
         {
           "path": "src/units/0018/4bffe57d3c-item_owner_native_placeable.cpp",
-          "sha256": "07a86298ea1e384f879851b235008decfbeab17cc8b7f9424512e193fc4eda84"
+          "sha256": "ef6635822520550a04f8420916621a2f7a894982817c0f8d81ff5c6190a3e82d"
         },
         {
           "path": "src/units/0019/496433f08a-winmain.cpp",
@@ -40473,7 +40581,7 @@
         },
         {
           "path": "src/units/0039/c00b678f72-w5_picking.cpp",
-          "sha256": "2c5e7f568b26839056d9098dc50bed2183fbcf072ba80eb8c8922412a3de1b8c"
+          "sha256": "e422c0e537d750f0ecb3c835d69be07b61aec75728fb6ea42831ea601e592b17"
         },
         {
           "path": "src/units/0039/dd3ec5867e-w5_foreign.hpp",
@@ -73201,7 +73309,7 @@
         },
         {
           "path": "src/units/1043/884db017d1-gff_writer_native_live.cpp",
-          "sha256": "14b5f05ed5f38560f433a1f6c818044d10df6911b5c923119b7c9059d1eaa436"
+          "sha256": "031a3636dbbd0596d5ee674e525f67b8191827e2cf695fc979a10213afde46b6"
         },
         {
           "path": "src/units/1043/98f9874dbc-gff_write_core.hpp",
@@ -73313,7 +73421,7 @@
         },
         {
           "path": "src/units/1190/5fe5246053-item_equip_native_query_export.cpp",
-          "sha256": "3b82f154b7e87cad72b931b976a2bb81a2dff1129141c30e79982c79c5b7d395"
+          "sha256": "b09b7dc97f02e79600580cc7c3f7aed4f38bc5352772c61ce1223c62e916cbe9"
         },
         {
           "path": "src/units/1190/8ccf125a73-item_property_query.hpp",
@@ -74485,7 +74593,7 @@
         },
         {
           "path": "src/units/1416/8ed125f1f1-w5_walkmesh_adapters.cpp",
-          "sha256": "8cb26a398172b7b87fb9e868981f7021515ee287ef54409384e2ef44bafa7535"
+          "sha256": "e29fbc0a32c261de5d9c083cb59c5f365c8a06360bd7af38f31899f0f50c8793"
         },
         {
           "path": "src/units/1416/8fe63eea15-room_valid_helpers.hpp",
@@ -93270,6 +93378,30 @@
         {
           "path": "src/math/kotor_x87.h",
           "sha256": "406af86158e280ce9c257fc8c7e11b85b0306edd69f046ecc514403315ea0920"
+        },
+        {
+          "path": "src/bridge/a_sws_creature_broadcast.cpp",
+          "sha256": "3ff0d330f8a6fa720db696d31cb4ec5fe4fefdc95a609c383ac63f4c610e594a"
+        },
+        {
+          "path": "src/bridge/c_client_exo_app.cpp",
+          "sha256": "302b5a14fc65198a2e45d48c245dfb960f2d25d191b6e4a068276af58952e5b5"
+        },
+        {
+          "path": "src/bridge/d_res_ref.cpp",
+          "sha256": "173b491b83b54d365e77469d9fe2010b6116e503643593bfb6337334b109099e"
+        },
+        {
+          "path": "src/bridge/f_inventory.cpp",
+          "sha256": "e15369ae45e6d2d11973fb1b2a0b6f3db545ebb26968e16af51590acb9be00f6"
+        },
+        {
+          "path": "src/bridge/f_surfmesh.cpp",
+          "sha256": "b0e31957b351346b064da8cb33a94807f3a9fba11d47a3cafacd4c5f938059f6"
+        },
+        {
+          "path": "src/bridge/j_exo_input.cpp",
+          "sha256": "342d6a9e350ad2861c913fe3b48b20792aba6c22b601fcf14a571289ded1ed64"
         }
       ],
       "generation": {

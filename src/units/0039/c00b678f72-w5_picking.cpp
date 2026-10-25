@@ -41,6 +41,7 @@ void* __fastcall kotor_fastcall_005ed580(void* app, void*, U id);               
 unsigned char __fastcall kotor_fastcall_00684ed0(void* menu, void*, void* control);     // CSWGuiTargetActionMenu::IsTargetActionMenuControl (0769)
 void* __fastcall aurora_hit_info_construct_004578f0(void* self, void*, U a, U b, U c);  // CHitInfo::CHitInfo (0478)
 void __fastcall kotor_fastcall_005f6410(void* internal, void*);                         // EmptyHitcheckIgnoreList (0399)
+int __fastcall kotor_fastcall_005df730(void* input, void*);                             // CExoInput::GetLastSetMouseDownState (src/bridge)
 U __fastcall c2da_current_get_int_entry_00413510(void* table, void*, U row, U column, I* out); // C2DA::GetINTEntry(int, int, int*) (0390)
 extern U kotor_rules_cell32_007a225c;                                                   // [007A225C] cached column index (0431)
 U16 __fastcall kotor_m15a_object_get_current_animation_0063c060(void* object, void*);   // CSWCObject::GetCurrentAnimation (0817)
@@ -209,7 +210,7 @@ void __fastcall kotor_fastcall_006222f0(void* ci, void*, U id, const Vector* pos
         return;
     }
     void* input = kotor_menu_window_cells::input_007a39e4;
-    const U down = at<U>(at<void*>(input, 4), 0x3ac);                                // 00622403..09 GetLastSetMouseDownState (no null test)
+    const U down = static_cast<U>(kotor_fastcall_005df730(input, nullptr));         // 00622403..09 GetLastSetMouseDownState (no null test)
     U cursor = 1;
     if (input != nullptr) cursor = menu_tables_m41::InputSetMouseCursor_005df5c0(input, nullptr, 1, 0, down); // 0062240E..23
     if (at<void*>(ci, 0x274) == nullptr) return;                                     // 00622428..30

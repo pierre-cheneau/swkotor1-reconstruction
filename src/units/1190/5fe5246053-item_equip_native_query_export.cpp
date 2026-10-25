@@ -1,5 +1,6 @@
 #include "59f041620a-item_equip_slots.hpp"
 extern "C" unsigned __fastcall kotor_fastcall_004d8230(void*,void*,unsigned,void*);
+extern "C" unsigned long* __fastcall kotor_fastcall_005a49c0(void*,void*,unsigned long); // CSWInventory::GetItemSlotPtr (src/bridge)
 namespace kotor_menu_window_cells{extern void* volatile manager_007a39fc;}
 #include "f991b6c125-item_equip_check.hpp"
 #include "45c54dc875-item_equip_feats.hpp"
@@ -21,7 +22,7 @@ struct Slots:recovered_item_equip_slots::Ports{U read(U a)override{return rd(a);
 struct Check:recovered_item_equip_check::Ports{U read(U a)override{return rd(a);}U byte(U a)override{return by(a);}U level(U a)override{return recovered_stats_level_005a5fd0(ptr(a),nullptr,0);}U item_level(U a)override{return kotor_fastcall_00554080(ptr(a),nullptr);}U options()override{return word(recovered_server_info_004aec90(ptr(rd(word(kotor_menu_window_cells::manager_007a39fc)+8)),nullptr));}void signal(U a,U id)override{recovered_creature_feedback_004ede10(ptr(a),nullptr,id,nullptr);}U predicate(U address,U self,U item,U slot)override{if(address==0x510e30){Feats p;return recovered_item_equip_feats::check(self,item,slot,p);}Restrictions p;switch(address){case 0x5145a0:return recovered_item_equip_restrictions::alignment(self,item,p);case 0x518210:return recovered_item_equip_restrictions::classes(self,item,p);case 0x5182f0:return recovered_item_equip_restrictions::race(self,item,p);default:/*0x514650*/return recovered_item_equip_restrictions::feats(self,item,p);}}U choose(U self,U item,U out,U mode,U messages,bool weapon)override{Slots p;return weapon?recovered_item_equip_slots::weapon(self,item,out,mode,messages,p):recovered_item_equip_slots::other(self,item,out,mode,messages,p);}U rule(U id)override{return base(id);}};}
 extern "C" unsigned char __fastcall recovered_item_can_equip_0051aa60(void*self,void*,void*item,unsigned*slot,unsigned mode,unsigned bypass,unsigned messages){Check p;return static_cast<unsigned char>(recovered_item_equip_check::check(word(self),word(item),word(slot),mode,bypass,messages,p));}
 
-extern "C" void* __fastcall recovered_equipment_item_005a4c20(void*self,void*,unsigned mask){Slots p;return ptr(recovered_item_equip_slots::equipped(word(self),mask,p));}
+extern "C" void* __fastcall recovered_equipment_item_005a4c20(void*self,void*,unsigned mask){unsigned long*slot=kotor_fastcall_005a49c0(self,nullptr,mask);Slots p;return slot?ptr(p.item(*slot)):nullptr;}
 extern "C" void* __fastcall recovered_item_lookup_004ae760(void*server,void*,unsigned id){return ptr(item_lookup(word(server),id));}
 
 extern "C" unsigned __fastcall recovered_item_property_has_00555c90(void*self,void*,unsigned kind,unsigned subtype){Query p;return recovered_item_property_query::has(word(self),kind,subtype,p);}

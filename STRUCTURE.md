@@ -12,10 +12,10 @@ that check each other:
 | Proof | Manual play (see [STATUS.md](STATUS.md)) | Each function compiles to the original's bytes |
 | Output | `swkotor-reconstructed.exe` | Per-function comparison now; the identical `swkotor.exe` later |
 
-Today the modern-toolchain build covers 95.3% of the 9,252 functions and
+Today the modern-toolchain build covers 97.5% of the 9,252 functions and
 builds the full game:
-- 7,232 have their own definition
-- 1,323 are folded into other functions
+- 7,336 have their own definition, 9 of them byte-identical matched code (phase 2)
+- 1,421 are folded into other functions
 - 264 C runtime functions come from VS2022's library
 
 5,252 (56.8%) are byte-identical. The tracker in
@@ -41,6 +41,7 @@ through git history.
 ```
 src/, build.py, build-manifest.json, local_generators/   playable build (unchanged)
 pin_sources.py            refresh the source hashes build-manifest.json pins
+bridge_sources.py         generate src/bridge/ (matched code in the playable build) from src/bridge/bridge.json
 tests/                    tooling tests and golden outputs, on synthetic game files only
 matching/
   src/<bucket>/*.cpp        matched sources; buckets are address ranges, see below
@@ -102,20 +103,51 @@ original there tells you which address each symbol stands for.
 - 1,962 functions it calls
 - 2,316 data symbols: globals, vtables and strings
 
-With that map, `build.py` could gain an opt-in switch (proposed, not
-implemented) that, for every matched function:
-1. compiles the matched `.cpp` with the playable toolchain;
-2. generates a `kotor_<cc>_<address>` wrapper that calls the matched
-   implementation, and drops the playable definition for that address;
-3. generates definitions for the symbols the matched code calls or reads,
-   forwarding to the playable build's existing `kotor_<cc>_<address>`
-   functions and globals.
+`bridge_sources.py` implements the first step. `src/bridge/bridge.json` names
+matched functions (status MATCH) and, for each, the playable site it now
+serves. The tool writes one unit per matched file into `src/bridge/`:
+- the matched file's own declarations and the selected functions only, with
+  its `matching/include` headers inlined, compiled by MSVC 14.44 under the
+  manifest's strict recipe (`/W4 /WX`);
+- all inside a namespace of the unit's own, so no class, inline function or
+  vtable can merge with another unit's copy;
+- one `extern "C"` entry per function, `kotor_fastcall_<address>`, taking
+  classes as `void*` like the rest of the playable build;
+- forwards for the callees the spec names: the member is defined by calling
+  the playable build's entry for that address, after checking its parameter
+  count and return against the original's signature. Any other function or
+  global the slice uses stays unresolved and fails the link.
 
-Play-testing that build then tests matched code inside the real game. Open
-questions before it can work:
-- Matched code must also compile under clang-cl. 2002-era C++ mostly does;
-  x87 inline asm and MSVC 7 pragmas need guards.
-- Globals have to map to the playable build's data by address.
+The tool also keeps the manifest's bridge units and pins in step.
+`--check` and a test fail if anything is out of date. The playable site then
+calls the entry instead of its own copy of the logic. The tracker counts
+the entries as definitions and ignores the addresses that the inlined
+matched code mentions.
+
+The first nine functions replace native port bodies whose logic was the
+callee's, inline:
+- `CResRef::GetLength`, `CSWSCreature::SetFlag288Bit3`
+- `CSWRoomSurfaceMesh::GetAdjacentSecond`, `CSWInventory::GetItemSlotPtr`
+- `CExoInput::GetLastSetMouseDownState`
+- `CClientExoApp::GetPlayModulePanel`, `EmptyHitcheckIgnoreList`,
+  `GetPlayerCharacterSet` and `GetLoadFromIFO`
+
+A differential emulation agreed with the original on every trial. It ran each
+original function and its rebuilt entry on identical random memory and
+compared return values, memory writes, stack cleanup and forwarded calls.
+They still need play-testing.
+
+Still open:
+- Globals have to map to the playable build's data by address (a data
+  bridge). Until then, functions that read globals or write vtables (such as
+  polymorphic constructors and destructors) are not bridged.
+- Callees that exist in the playable build only inside port helpers,
+  without a native entry, need one before a caller can be bridged.
+- Sites where the callee's logic is inline in `derived/` code need a port
+  change, not a body swap.
+- Some playable functions already implement an original address under a
+  name without it (for example `CExoRandInternal::Rand`, kept as exact naked
+  assembly). They are ported but uncounted, and must not be replaced.
 - 110 symbols resolve to more than one address. These are identical copies
   in the original, such as per-object string literals and duplicated
   inline bodies, or naming slips in matched headers. They need a rule.

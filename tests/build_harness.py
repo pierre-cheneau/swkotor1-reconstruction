@@ -24,6 +24,7 @@ import threading
 from pathlib import Path
 
 CHECKOUT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(CHECKOUT))             # the code the helpers wrap
 sys.path.insert(0, str(CHECKOUT / "tests"))
 import synthetic_pe  # noqa: E402
 

@@ -5,6 +5,8 @@
 // offset {E-xx} (lane-w3 tools/sdis.py; LoadArea frame depth 174h at every cited site).
 #include "c39a01a95c-w3_client_area.h"
 
+extern "C" void __fastcall kotor_fastcall_005ed770(void* app, void*);   // CClientExoApp::EmptyHitcheckIgnoreList (src/bridge)
+
 using namespace kotor_w3;
 
 namespace {
@@ -599,7 +601,7 @@ U __fastcall recovered_client_handle_area_0064bab0(void* self, void*, U minor) n
     (void)recovered_bridge_exo_timers_high_resolution_005e9260(rp(kotor_menu_10_19::dependencies::base_007a39e0, 4), nullptr);   // 0064BD74..0064BD80
     (void)kotor_input_required::get_snapshot_time_difference_004adc80(frame_GetWorldTimer_005ed4f0(client_app(), nullptr), nullptr);   // 0064BD85..0064BD95
     frame_LogStringDtor_005e5c20(&screen_name, nullptr);              // 0064BD9A..0064BDA3
-    kotor_fastcall_005f6410(rp(client_app(), 4), nullptr);            // 0064BDA8..0064BDB0 EmptyHitcheckIgnoreList
+    kotor_fastcall_005ed770(client_app(), nullptr);                   // 0064BDA8..0064BDB0 EmptyHitcheckIgnoreList
     kotor_cdecl_00401c10(fbits(0x3D4CCCCDu), 0, 0);                   // 0064BDB5..0064BDC3 UpdateScreen(0.05, 0, 0)
     recovered_client_area_unload_area_00609410(area, nullptr);        // 0064BDC6..0064BDC8
     const float px = read_float(self), py = read_float(self), pz = read_float(self);   // 0064BDCD..0064BDFF {E-0x48..}

@@ -55,12 +55,17 @@ class Scan:
 
 def scan_file(path: Path) -> Scan:
     text = path.read_text(encoding="utf-8", errors="replace")
+    # src/bridge/ holds generated slices of matched sources: only their kotor_fastcall_ entries define
+    # functions, and the addresses the matched code mentions are not playable citations.
+    bridge = path.parent.name == "bridge" and path.parent.parent.name == "src"
     found, line, counted = [], 1, 0
     for m in definitions(text):
         line += text.count("\n", counted, m.start())
         counted = m.start()
-        found.append((int(m.group(1), 16), line))
-    return Scan(path, frozenset(int(a, 16) for a in set(CITED.findall(text))), tuple(found))
+        if not bridge or m.group(0).startswith("kotor_fastcall_"):
+            found.append((int(m.group(1), 16), line))
+    cited = frozenset() if bridge else frozenset(int(a, 16) for a in set(CITED.findall(text)))
+    return Scan(path, cited, tuple(found))
 
 
 def scan(root: Path = ROOT) -> list[Scan]:

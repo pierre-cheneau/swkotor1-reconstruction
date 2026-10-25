@@ -14,6 +14,7 @@
 #include "4c7ad9327a-object_position.hpp"      // server-runtime-source/source (read-only): 004CD170 host body
 
 extern "C" std::uint32_t __cdecl aurora_vector_equal_004aa980(const void* left, const void* right);
+extern "C" int __fastcall kotor_fastcall_00581150(void* mesh, void*, int edge);   // CSWRoomSurfaceMesh::GetAdjacentSecond (src/bridge)
 
 namespace {
 using namespace kotor::server_mainloop;
@@ -83,8 +84,8 @@ I __fastcall w5_adapt_room_no_nonwalk_polys_00579680(void* room, void*, Vector* 
         word(const_cast<float*>(high)), word(const_cast<float*>(radius)), word(walk_hit)));
 }
 I __fastcall w5_adapt_room_adjacent_00579420(void* room, void*, U edge) {
-    DirectMemory m;
-    return static_cast<I>(room_adjacent_00579420(m, word(room), edge));
+    DirectMemory m;                                                  // 00579420: the room's surface mesh at +3Ch
+    return static_cast<I>(kotor_fastcall_00581150(ptr(m.read(word(room) + 0x3c)), nullptr, static_cast<int>(edge)));
 }
 // 004CD170 CSWSObject::SetOrientation: W1's 0886 wrapper w1x_object_set_orientation_004cd170 (ruling; the W5
 // adapter over the same 1018 host body is withdrawn).

@@ -1,0 +1,13 @@
+{
+  "functions": [
+    {"address": "00406040", "site": "src/units/1043/884db017d1-gff_writer_native_live.cpp: port ref_length"},
+    {"address": "004EAD70", "site": "src/units/0018/4bffe57d3c-item_owner_native_placeable.cpp: port plot"},
+    {"address": "00581150", "site": "src/units/1416/8ed125f1f1-w5_walkmesh_adapters.cpp: w5_adapt_room_adjacent_00579420"},
+    {"address": "005A49C0", "site": "src/units/1190/5fe5246053-item_equip_native_query_export.cpp: recovered_equipment_item_005a4c20"},
+    {"address": "005DF730", "site": "src/units/0039/c00b678f72-w5_picking.cpp: mouse-down read at 00622403"},
+    {"address": "005ED6A0", "site": "src/units/0007/31d1a4213d-client_status_native.cpp: port gui"},
+    {"address": "005ED770", "site": "src/units/0016/9b438f14aa-w3_client_area_load.cpp: call at 0064BDA8", "forwards": ["005F6410"]},
+    {"address": "005EDAC0", "site": "src/units/0007/31d1a4213d-client_status_native.cpp: port has_character"},
+    {"address": "005EDD60", "site": "src/units/0007/31d1a4213d-client_status_native.cpp: port downloaded"}
+  ]
+}
