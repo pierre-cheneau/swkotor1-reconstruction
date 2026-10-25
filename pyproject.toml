@@ -21,3 +21,17 @@ package = false
 testpaths = ["tests", "matching/tools"]
 pythonpath = [".", "tests", "matching/tools"]
 addopts = "-p no:cacheprovider"
+
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+extend-exclude = ["src", "matching/src", "matching/include"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "B", "I", "UP", "SIM", "PL", "RUF"]
+ignore = [
+    "PLR2004",  # magic values: addresses, sizes and opcodes are the domain
+    "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR0917",
+    "PLC0415",  # optional dependencies are imported where used
+    "RUF001", "RUF002", "RUF003",  # typographic characters in user-facing text
+]

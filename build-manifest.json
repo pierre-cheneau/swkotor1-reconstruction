@@ -93241,15 +93241,15 @@
         },
         {
           "path": "local_math/build_math.py",
-          "sha256": "c7ec21f1fad401ddc56341943e2618e62e0746d646b6d31f4706b54a25287fa1"
+          "sha256": "c113cea5ee81e031841c70f1b32aa3aeefb1d202992b30917fe77130ee46a810"
         },
         {
           "path": "local_math/gen_l1_asm.py",
-          "sha256": "7ee932e49657f68ce07a004891a76063c6ba5d38139c4df9eec19f69600cb5b3"
+          "sha256": "cf2e1e25f8bc3a92918e7c2ff4568ddf1c4507b3ca8160597dbe22ae8c84dbd4"
         },
         {
           "path": "local_math/l1_bytegate.py",
-          "sha256": "dd611be84e8a3f08cd92aefa0ec00a3bc38dd3e734625dc4b03ab45aca6f7eb1"
+          "sha256": "b3490b60902bb141c62a4e818db4ec054bb0839372846aacca6ee32c3c67c117"
         },
         {
           "path": "local_math/providers.json",

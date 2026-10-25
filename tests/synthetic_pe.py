@@ -197,9 +197,14 @@ def original_resources() -> dict[int, dict[int, dict[int, bytes]]]:
             for kind in (1, 3, 12, 14, 16, 24)}      # 24 (manifest) is not copied
 
 
-def write_original(path: Path, generators: Path, seed: int = 1) -> bytes:
-    """Write a synthetic swkotor.exe and return its bytes."""
+def write_original(path: Path, generators: Path, seed: int = 1,
+                   patches: dict[int, bytes] | None = None) -> bytes:
+    """Write a synthetic swkotor.exe and return its bytes; patches places
+    exact bytes at given addresses (code for the math transcription)."""
     layout = original_layout(generators)
+    for va, data in (patches or {}).items():
+        for i, byte in enumerate(data):
+            layout.set(va + i, byte)
     rng = random.Random(seed)
     sections = [(name, va, vsize, _fill(va, raw_size, layout, rng, name == b".text"), flags)
                 for name, va, vsize, raw_size, flags in ORIGINAL_SECTIONS]

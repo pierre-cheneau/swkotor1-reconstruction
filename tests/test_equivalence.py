@@ -15,6 +15,7 @@ from pathlib import Path
 
 import build_harness
 import generator_harness
+import math_harness
 
 ROOT = Path(__file__).resolve().parents[1]
 GOLDEN = ROOT / "tests" / "golden"
@@ -44,3 +45,8 @@ def test_todo_matches_golden() -> None:
         run = subprocess.run([sys.executable, str(ROOT / "matching/tools/todo.py"), *shlex.split(arguments)],
                              cwd=ROOT, check=True, capture_output=True, text=True)
         assert run.stdout == output, arguments
+
+
+def test_l1_math_transcription_matches_golden(tmp_path: Path) -> None:
+    expected = json.loads((GOLDEN / "l1_math.json").read_text(encoding="utf-8"))
+    assert math_harness.run_math(ROOT, tmp_path) == expected
