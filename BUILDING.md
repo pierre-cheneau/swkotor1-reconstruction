@@ -9,7 +9,7 @@ Install these separately from their official sources:
 - [uv](https://docs.astral.sh/uv/getting-started/installation/), which runs the Python tooling in a project environment with Python 3.13.
 - [Visual Studio 2022 C++ Build Tools](https://aka.ms/vs/17/release/vs_buildtools.exe), with the Desktop development with C++ components, MSVC v143 14.44 and [Windows SDK](https://learn.microsoft.com/en-us/windows/apps/windows-sdk/) 10.0.26100.0. The script selects these versions explicitly; newer defaults alone are insufficient.
 - [LLVM 23.1.2](https://github.com/llvm/llvm-project/releases/tag/llvmorg-23.1.2), using the `clang+llvm-23.1.2-x86_64-pc-windows-msvc` distribution. Pass its `bin\clang-cl.exe` path. The runner checks version 23.1.2 and LLVM revision `85ac560262434c9ccfc0c183ec22d4138ed647fb`.
-- [pefile 2024.8.26](https://pypi.org/project/pefile/2024.8.26/), and [Capstone 5.0.7](https://pypi.org/project/capstone/5.0.7/) for the c67 local math generator, which decodes the supported executable. From the checkout root, `uv sync` installs both, at the versions `uv.lock` pins, into `.venv`:
+- [pefile 2024.8.26](https://pypi.org/project/pefile/2024.8.26/), and [Capstone 5.0.7](https://pypi.org/project/capstone/5.0.7/) for the c67 local math generator, which decodes the supported executable, and [Unicorn 2.1.4](https://pypi.org/project/unicorn/2.1.4/), which `bridge_gate.py` emulates with. From the checkout root, `uv sync` installs all three, at the versions `uv.lock` pins, into `.venv`:
 
 ```powershell
 uv sync
@@ -52,6 +52,16 @@ The build validates the source manifest, generates required original-backed data
 Keep the entire output directory private. Its generated original-derived math code and tables, constants, resource data and import libraries are local build inputs, not distributable project source. The output directory receives a `.gitignore`; do not upload it or its executable as part of a source contribution. The game build does not launch the resulting game.
 
 See [STATUS.md](STATUS.md) for build and runtime results and their limits.
+
+## Verify the bridge
+
+The functions in `src/bridge/` are byte-identical matched source compiled into this build (see [STRUCTURE.md](STRUCTURE.md#2-the-bridge-matched-code-inside-the-playable-build)). `bridge_gate.py` checks each one against your original after a build. It emulates the original function and its rebuilt entry with the [Unicorn](https://pypi.org/project/unicorn/2.1.4/) engine on identical random state, and compares everything they return, write and call:
+
+```powershell
+uv run .\bridge_gate.py --game-dir "D:\Games\Star Wars - KotOR" --build "D:\KotorBuilds\game-01"
+```
+
+It reads the installation and the build output and runs neither program. Each function prints `PASS`, `FAIL` with its first difference, or `INCONCLUSIVE` when too few trials ran to the end. The exit code is 0 only when all pass. `--trials` sets the trials per function (default 300), and `--only 004B1740 ...` limits the check to some functions.
 
 ## Prepare a runtime copy
 

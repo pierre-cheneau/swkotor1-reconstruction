@@ -6,6 +6,7 @@ requires-python = ">=3.13"
 dependencies = [
     "pefile==2024.8.26",
     "capstone==5.0.7",
+    "unicorn==2.1.4",
 ]
 
 [dependency-groups]
@@ -43,6 +44,6 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["local_generators", "local_math", "build", "pin_sources", "coff", "playable", "matchcmp",
-                     "symbolmap", "libmatch", "ppcnames", "render_banner", "todo", "bridge_sources", "cpp_scope", "synthetic_pe",
+                     "symbolmap", "libmatch", "ppcnames", "render_banner", "todo", "bridge_sources", "bridge_gate", "cpp_scope", "synthetic_pe",
                      "synthetic_coff",
                      "generator_harness", "build_harness", "math_harness", "l1_fixture", "l1_object"]

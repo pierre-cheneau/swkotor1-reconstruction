@@ -43,6 +43,7 @@ src/, build.py, build-manifest.json, local_generators/   playable build (unchang
 pin_sources.py            refresh the source hashes build-manifest.json pins
 bridge_sources.py         generate src/bridge/ (matched code in the playable build) from src/bridge/bridge.json
 cpp_scope.py              namespace-scope C++ declarations, for binding names across units
+bridge_gate.py            emulate each bridged function against the original on a finished build (local)
 tests/                    tooling tests and golden outputs, on synthetic game files only
 matching/
   src/<bucket>/*.cpp        matched sources; buckets are address ranges, see below
@@ -158,17 +159,21 @@ inline:
 - `CServerExoAppInternal::FUN_004b4030`, through `g_pAppManager`
 - `CServerExoAppInternal::GetItemByGameObjectID`, with two agreed constants
 
-A differential emulation agreed with the original on every trial. It ran each
-original function and its rebuilt entry on identical random memory and
-compared:
+`bridge_gate.py` checks a finished build, locally, like the L1 math gate.
+It uses the Unicorn emulator, never running either program natively, to
+execute each original function and its rebuilt entry on identical random
+state and compare:
 - return values, memory writes and stack cleanup;
-- globals, with each one's value set at both programs' addresses;
-- calls to stubbed callees;
-- vtable pointers, normalized between the two programs.
+- the bound globals, with each one's value set at both programs' addresses;
+- the calls made to forwards, answered identically on both sides;
+- vtable pointers, mapped between the two programs.
 
-Negative controls fail as they should: a swapped function, a global bound to
-the wrong variable, and an unnormalized vtable. The functions still need
-play-testing.
+It derives everything from the spec, the bridge's bindings and the build's
+link map. It fails a function whose trials rarely run to the end, so a pass
+cannot be vacuous. All twelve functions pass. Its tests use hand-assembled
+functions: equivalent pairs agree, and mutants (a wrong field, a missing stack
+pop, a wrong `this` for a forward, a misbound global, an unmapped vtable) are
+caught. The functions still need play-testing.
 
 The data bridge refuses unsound bindings rather than guessing. `AurSetFog`
 writes `g_vFogColor[3]` as one array, but the playable build keeps those
