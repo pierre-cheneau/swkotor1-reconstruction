@@ -39,8 +39,8 @@ Word ability_stat(Memory& m, CharSheetPorts& x, Word rules, Word stats, Word abi
     const Word row2 = m.read(rules + 0xb0) + (m.read16(stats + 0xdc) & 0xffffu) * 0x34;
     return static_cast<Word>(s8(m.read8(row2 + kRaceColumn[ability])) + s8(b2) + static_cast<I>(m.read8(stats + kStatsByte[ability])));
 }
-Word total_bonus(Memory& m, CharSheetPorts& x, Word stats, Word ability, Word s) {
-    return effect(m, x, m.read(stats + 0x24), 4, 0, ability, s);
+Word total_bonus(Memory&, CharSheetPorts& x, Word stats, Word ability, Word) {
+    return x.total_ability_bonus_005a58b0(stats, ability);
 }
 Word dex_mod_005a5330(Memory& m, CharSheetPorts& x, Word stats, Word flag) {
     Word cap = 0;                                                 // EBX

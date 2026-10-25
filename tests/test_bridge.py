@@ -49,15 +49,42 @@ def test_entries_carry_classes_as_void_pointers(demangled: str, prototype: str, 
     assert call in f.entry_definition()
 
 
-def test_forwards_define_the_member_through_the_playable_entry() -> None:
-    f = function("public: int __thiscall CServerExoAppInternal::ExecuteLoadModule(class CExoString &)", 0x004BA820)
-    assert f.forward_definition() == (
-        "int CServerExoAppInternal::ExecuteLoadModule(CExoString& a0)\n{\n"
-        "    return kotor_fastcall_004ba820(const_cast<void*>(static_cast<const void*>(this)), nullptr, "
-        "const_cast<void*>(static_cast<const void*>(&a0)));\n}\n")
-    const = function("public: class CGuiPanel * __thiscall CApp::Panel(void)const ", 0x00401000)
-    assert "CGuiPanel* CApp::Panel() const" in const.forward_definition()
-    assert "static_cast<CGuiPanel*>(kotor_fastcall_00401000(" in const.forward_definition()
+@pytest.mark.parametrize(("demangled", "head"), [
+    ("public: int __thiscall CServerExoAppInternal::ExecuteLoadModule(class CExoString &)",
+     "int CServerExoAppInternal::ExecuteLoadModule(CExoString&)"),
+    ("public: class CGuiPanel * __thiscall CApp::Panel(void)const ", "CGuiPanel* CApp::Panel() const"),
+    ("public: __thiscall CExoString::CExoString(char const *)", "CExoString::CExoString(char const*)"),
+    ("public: __thiscall CExoString::~CExoString(void)", "CExoString::~CExoString()"),
+    ("public: class CExoString __thiscall CExoString::operator+(class CExoString const &)const ",
+     "CExoString CExoString::operator+(CExoString const&) const"),
+])
+def test_forwards_jump_to_the_playable_entry(demangled: str, head: str) -> None:
+    """Every kind of member is one naked jump: thiscall and its fastcall entry share the frame."""
+    assert function(demangled, 0x004BA820).forward_definition("some_entry_004ba820") == (
+        f"__declspec(naked) {head}\n{{\n    __asm jmp some_entry_004ba820\n}}\n")
+
+
+def test_a_class_returned_by_value_is_built_at_the_hidden_pointer() -> None:
+    f = function("public: class CExoString __thiscall CServerExoApp::GetModuleName(void)", 0x004AE6C0)
+    assert (f.hidden, f.result, f.stack) == (True, "eax", 4)
+    assert f.prototype() == "void* __fastcall kotor_fastcall_004ae6c0(void* self, void*, void* out)"
+    assert ("    ::new (out) CExoString(static_cast<CServerExoApp*>(self)->GetModuleName());\n"
+            "    return out;\n") in f.entry_definition()
+    pointer = function("public: class CExoString * __thiscall A::B(void)")
+    assert not pointer.hidden and pointer.result == "eax"
+
+
+@pytest.mark.parametrize(("demangled", "stack", "result"), [
+    (TYPICAL, 0, "eax"),
+    ("public: void __thiscall A::B(int,class CExoString const &,double,__int64)", 24, "void"),
+    ("public: float __thiscall A::B(enum E)", 4, "st0"),
+    ("public: __int64 __thiscall A::B(void)", 0, "edx:eax"),
+    ("public: __thiscall A::A(int)", 4, "eax"),
+    ("public: int __thiscall A::B(struct Vector,int)", None, "eax"),
+])
+def test_stack_bytes_and_result_register(demangled: str, stack: int | None, result: str) -> None:
+    f = function(demangled)
+    assert (f.stack, f.result) == (stack, result)
 
 
 @pytest.mark.parametrize("demangled", [
@@ -155,17 +182,83 @@ def tables(signatures=None, globals_=None, vftables=None) -> bridge.Tables:
 
 
 def unit(tables_: bridge.Tables, data: bridge.PlayableData) -> bridge.Unit:
-    return bridge.Unit(Path("x.cpp"), [], [], tables_, data)
+    return bridge.Unit(Path("x.cpp"), [], {}, {}, tables_, data)
 
 
-def test_forwards_must_match_the_playable_signature(monkeypatch) -> None:
-    load = "public: int __thiscall CServerExoAppInternal::ExecuteLoadModule(class CExoString &)"
-    u = unit(tables({0x004BA820: {load}}), bridge.PlayableData([]))
-    monkeypatch.setattr(bridge, "playable_entry", lambda name, data: (3, False))     # src/ declares it void
-    with pytest.raises(ValueError, match="does not have the original's signature"):
-        u.forward(0x004BA820, "")
-    monkeypatch.setattr(bridge, "playable_entry", lambda name, data: (3, True))
-    assert u.forward(0x004BA820, "").entry == "kotor_fastcall_004ba820"
+def unit_with(tmp_path: Path, source: str, signature: str, bridged: str | None = None) -> bridge.Unit:
+    """A unit whose callee 004BA820 has signature; bridged, when given, is the bridged function's own signature."""
+    playable = tmp_path / "playable.cpp"
+    playable.write_text(source, encoding="utf-8")
+    return bridge.Unit(Path("x.cpp"), [], {}, {0x004BA820: function(bridged, 0x004BA820)} if bridged else {},
+                       tables({0x004BA820: {signature}}), bridge.PlayableData([playable]))
+
+
+LOAD = "public: int __thiscall CServerExoAppInternal::ExecuteLoadModule(class CExoString &)"
+
+
+@pytest.mark.parametrize("source", [
+    'extern "C" int __fastcall kotor_fastcall_004ba820(void* self, void*, void* name) { return 0; }',
+    'extern "C" {\nunsigned __fastcall kotor_fastcall_004ba820(void*,void*,void*) noexcept(false) {return 1;}\n}',
+])
+def test_forwards_find_the_playable_entry_in_either_linkage_form(tmp_path: Path, source: str) -> None:
+    forward = unit_with(tmp_path, source, LOAD).forward(0x004BA820, bridge.ForwardSpec(), "")
+    assert (forward.symbol, forward.function.name) == ("kotor_fastcall_004ba820", "ExecuteLoadModule")
+
+
+def test_forwards_may_name_their_entry(tmp_path: Path) -> None:
+    u = unit_with(tmp_path, 'extern "C" int __fastcall recovered_load_004ba820(void*, void*, void*) {return 0;}', LOAD)
+    assert u.forward(0x004BA820, bridge.ForwardSpec("recovered_load_004ba820"), "").symbol == "recovered_load_004ba820"
+    with pytest.raises(ValueError, match="needs exactly one"):
+        u.forward(0x004BA820, bridge.ForwardSpec(), "")
+
+
+@pytest.mark.parametrize(("source", "why"), [
+    ('extern "C" int __fastcall kotor_fastcall_004ba820(void*, void*) {return 0;}', "pops 0 stack bytes, the original"),
+    ('extern "C" void __fastcall kotor_fastcall_004ba820(void*, void*, void*) {}', "the original's result is in eax"),
+    ('extern "C" int __cdecl kotor_fastcall_004ba820(void*, void*, void*) {return 0;}', "not a fastcall entry"),
+    ('namespace { extern "C" int __fastcall kotor_fastcall_004ba820(void*, void*, void*) {return 0;} }',
+     "needs exactly one"),
+    ('extern "C" int __fastcall kotor_fastcall_004ba820(void*, void*, void*);', "needs exactly one"),
+])
+def test_forwards_keep_the_original_frame(tmp_path: Path, source: str, why: str) -> None:
+    with pytest.raises(ValueError, match=why):
+        unit_with(tmp_path, source, LOAD).forward(0x004BA820, bridge.ForwardSpec(), "")
+
+
+def test_a_forward_to_a_bridged_function_jumps_to_its_generated_entry(tmp_path: Path) -> None:
+    """The callers' view may differ from the defining file's (int vs unsigned long), never the frame."""
+    defining = "public: unsigned long __thiscall CServerExoAppInternal::ExecuteLoadModule(class CExoString const &)"
+    forward = unit_with(tmp_path, "", LOAD, defining).forward(0x004BA820, bridge.ForwardSpec(), "")
+    assert forward.symbol == "kotor_fastcall_004ba820"
+    other = "public: int __thiscall CServerExoAppInternal::ExecuteLoadModule(class CExoString &,int)"
+    with pytest.raises(ValueError, match="with 4 stack bytes and its result in eax, the bridged entry 8 and eax"):
+        unit_with(tmp_path, "", LOAD, other).forward(0x004BA820, bridge.ForwardSpec(), "")
+
+
+def test_a_bridged_function_takes_its_defining_files_signature() -> None:
+    defines = "public: int __thiscall CExoLocStringInternal::GetStringLength(unsigned long)"
+    calls = "public: unsigned long __thiscall CExoLocStringInternal::GetStringLength(int)"
+    t = bridge.Tables({}, {0x005ECA20: {defines, calls}}, {}, {}, {0x005ECA20: {defines}})
+    assert t.signature(0x005ECA20) == defines
+    assert t.signature(0x005ECA20, "class CExoLocStringInternal { unsigned long GetStringLength(int); };") == calls
+
+
+def test_template_members_are_not_forwarded(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="is a template"):
+        unit_with(tmp_path, "", "public: void __thiscall CExoArrayList<int>::Add(int)").forward(
+            0x004BA820, bridge.ForwardSpec(), "")
+
+
+def test_an_entry_src_already_defines_is_not_bridged_again(tmp_path: Path, monkeypatch) -> None:
+    playable = tmp_path / "entry.cpp"
+    playable.write_text('extern "C" unsigned char __fastcall kotor_fastcall_00406040(void* self, void*) {return 0;}',
+                        encoding="utf-8")
+    spec = tmp_path / "bridge.json"
+    spec.write_text(json.dumps({"functions": [{"address": "00406040"}]}), encoding="utf-8")
+    monkeypatch.setattr(bridge, "SPEC", spec)
+    monkeypatch.setattr(bridge, "pinned_sources", lambda: [playable])
+    with pytest.raises(ValueError, match="already defines kotor_fastcall_00406040"):
+        bridge.units()
 
 
 def test_several_signatures_resolve_to_the_one_the_slice_declares() -> None:
@@ -217,6 +310,29 @@ def test_compiler_generated_markers_own_only_their_line() -> None:
     assert "GetItemInSlot" not in bridge.select(text, set())[0]
     with pytest.raises(ValueError, match="compiler-generated"):
         bridge.select(text, {0x005A4C00})
+
+
+INSTANTIATED = """\
+template <class T> struct List { int Contains(T* p) { return p != 0; } int Count() { return 0; } };
+// The members below are identical for every T; the linker folded them.
+// FUNCTION: SWKOTOR 0x005D6CC0 SYMBOL: ?Contains@?$List@H@@QAEHPAH@Z
+// FUNCTION: SWKOTOR 0x005D6D00 SYMBOL: ?Count@?$List@H@@QAEHXZ
+template class List<int>;
+
+// FUNCTION: SWKOTOR 0x005D78F0
+int After() { return 2; }
+"""
+
+
+def test_members_of_an_explicit_instantiation_come_from_the_template() -> None:
+    """The instantiation line goes either way: it would emit every member, the unselected ones' callees included."""
+    text, kept = bridge.select(INSTANTIATED, {0x005D6CC0})
+    assert kept == {0x005D6CC0} and "template class" not in text and "After" not in text
+    assert text.startswith("template <class T> struct List")
+    assert bridge.select(INSTANTIATED, {0x005D78F0})[1] == {0x005D78F0}
+    stray = INSTANTIATED.replace("// FUNCTION: SWKOTOR 0x005D6D00", "// a note\n// FUNCTION: SWKOTOR 0x005D6D00")
+    with pytest.raises(ValueError, match="compiler-generated"):
+        bridge.select(stray, {0x005D6CC0})       # not a plain run of annotations over the line: not guessed
 
 
 # ---------------------------------------------------------------- the data bridge
@@ -279,6 +395,12 @@ def test_storage_refusals_say_why(playable, address, reason) -> None:
     assert playable.storage(address) == reason
 
 
+def test_storage_the_build_generates_binds_like_a_definition(playable) -> None:
+    rules = playable.storage(0x007A3A28)                  # local_generators/game_prepare.py's cell
+    assert rules.qualified == "::kotor_cell_rules_007a3a28" and rules.size == 4
+    assert rules.declaration() == 'extern "C" void* kotor_cell_rules_007a3a28;'
+
+
 def test_constants_need_every_definition_to_agree(playable) -> None:
     assert playable.constant(0x0074666C) == ("0", 2)
     assert playable.constant(0x00746640) is None          # 1 and 2 disagree
@@ -290,18 +412,20 @@ class CAppManager;
 extern CAppManager* g_pAppManager;                  // 0x007A39FC
 extern float g_vFogColor[3];
 extern const unsigned char GAME_OBJECT_VALID;
+extern unsigned char g_nDoorStateClosed;             // declared writable, but in the original's .rdata
 extern int g_unused;
 extern HWND g_window;
-int use() { return g_pAppManager != 0 && g_vFogColor[0] > 0 && GAME_OBJECT_VALID == 0 && g_window != 0; }
+int use() { return g_pAppManager != 0 && g_vFogColor[0] > 0 && GAME_OBJECT_VALID == g_nDoorStateClosed && g_window; }
 """
 
 
 def test_used_globals_bind_to_storage_or_agreed_constants(playable) -> None:
     t = tables(globals_={"g_pAppManager": {0x007A39FC}, "g_vFogColor": {0x0078DB24}, "GAME_OBJECT_VALID": {0x0074666C},
-                         "g_unused": {0x00700000}, "g_window": {0x007A39D8, 0x007A39DC}})
+                         "g_nDoorStateClosed": {0x0074666C}, "g_unused": {0x00700000},
+                         "g_window": {0x007A39D8, 0x007A39DC}})
     body, bound, unbound = unit(t, playable).bind_globals(MATCHED_GLOBALS)
     assert [(name, type(target).__name__) for name, target in bound] == [
-        ("g_pAppManager", "Storage"), ("GAME_OBJECT_VALID", "Constant")]
+        ("g_pAppManager", "Storage"), ("GAME_OBJECT_VALID", "Constant"), ("g_nDoorStateClosed", "Constant")]
     assert unbound == [
         ("g_vFogColor", "0078DB24: 12 bytes, the playable ::kotor_menu_window_cells::fog_0078db24 holds 4"),
         ("g_window", "2 original addresses in symbols.csv")]
@@ -310,6 +434,7 @@ def test_used_globals_bind_to_storage_or_agreed_constants(playable) -> None:
            "(::kotor_menu_window_cells::manager_007a39fc));                  // 0x007A39FC" in body
     assert 'static_assert(sizeof(CAppManager*) <= sizeof(::kotor_menu_window_cells::manager_007a39fc)' in body
     assert "const unsigned char GAME_OBJECT_VALID = 0;" in body
+    assert "unsigned char const g_nDoorStateClosed = 0;" in body       # a write would not compile
     assert "extern int g_unused;" in body and "extern float g_vFogColor[3];" in body     # untouched
 
 
@@ -322,3 +447,119 @@ def test_a_class_with_several_vftables_is_refused(playable) -> None:
         unit(tables(vftables={"CBoth": {0x00741000}}), playable).vtable(ctor)
     assert unit(tables(vftables={"CBoth": {0x0074A824}}), playable).vtable(ctor).variable.name == \
         "kotor_vtable_cswinventory_0074a824"
+
+
+def test_direct_c_heap_calls_are_rebound_to_the_game_heap() -> None:
+    body = "void f(void* p) { free(p); char* q = (char*)malloc(4); x.free(q); ::y->malloc(1); }"
+    assert bridge.heap_calls(Path("x.cpp"), body) == ["free", "malloc"]
+    assert bridge.heap_calls(Path("x.cpp"), "int g() { return freed(1); }") == []
+
+
+@pytest.mark.parametrize("call", ["realloc(p, 8)", "calloc(1, 4)", "_msize(p)", "_strdup(s)", "strdup(s)"])
+def test_heap_calls_without_a_game_heap_counterpart_are_refused(call: str) -> None:
+    with pytest.raises(ValueError, match="no game-heap counterpart"):
+        bridge.heap_calls(Path("x.cpp"), f"void f() {{ {call}; }}")
+
+
+@pytest.mark.parametrize(("declaration", "params"), [
+    ("void*& pos", ["void*&"]),
+    ("CExoLinkedListPosition& pos", ["void*&"]),          # through the body's typedef
+    ("unsigned long", ["unsigned long"]),
+    ("unsigned long nIndex, int n = 0", ["unsigned long", "int"]),
+    ("const CExoString& s", ["CExoString const&"]),
+    ("const char* text", ["char const*"]),
+    ("Space::Type", ["Space::Type"]),
+    ("void", []),
+])
+def test_declared_parameters_are_spelled_as_the_demangler_spells_them(declaration: str, params: list[str]) -> None:
+    assert bridge.declared_params(declaration, {"CExoLinkedListPosition": "void*"}) == params
+
+
+def test_overloads_resolve_by_their_parameters() -> None:
+    node = "public: void * __thiscall CExoLinkedListInternal::GetNext(struct CExoLinkedListNode * &)"
+    void = "public: void * __thiscall CExoLinkedListInternal::GetNext(void * &)"
+    body = ("typedef void* CExoLinkedListPosition;\nclass CExoLinkedListInternal {\npublic:\n"
+            "    void* GetNext(CExoLinkedListPosition& pos);   // 0x005E9B90\n};")
+    assert bridge.Tables({}, {0x005E9B90: {node, void}}, {}, {}).signature(0x005E9B90, body) == void
+
+
+HELPERS = """\
+CWorldJournalEntry* CopyWorldJournalEntry(const CWorldJournalEntry& e)
+{
+    return new CWorldJournalEntry(e);
+}
+static int Clamp(int n) { return n < 0 ? 0 : n; }
+inline int Twice(int n) { return 2 * n; }
+static inline int Thrice(int n) { return 3 * n; }
+template <class T> T Same(T t) { return t; }
+int table[2] = {1, 2};
+
+// FUNCTION: SWKOTOR 0x005F7DC0
+// a note between the annotation and its definition
+int CThing::Selected(int n)
+{
+    return Clamp(n);
+}
+"""
+
+
+def test_unannotated_helpers_become_inline_and_selected_definitions_stay_verbatim() -> None:
+    text = bridge.inline_helpers(HELPERS)
+    assert "inline CWorldJournalEntry* CopyWorldJournalEntry(" in text
+    assert "inline static int Clamp(" in text
+    assert "inline int Twice(" in text and "inline inline" not in text and "static inline int Thrice(" in text
+    assert "inline template" not in text and "inline int table" not in text
+    assert "// a note between the annotation and its definition\nint CThing::Selected(int n)" in text
+
+
+CLASSES = """\
+struct Vector { Vector() {} float x, y, z; };
+struct Plain { int a; char* b; };
+enum Kind { KIND_A };
+typedef unsigned long OBJECT_ID;
+class CExoLinkedListInternal { public: CExoLinkedListInternal(); void* pHead; void* pTail; int nCount; };
+class CHolder { public: CHolder(); Plain plain; Kind kind; OBJECT_ID id; static int s_count; };
+class CMesh { public: CMesh(unsigned short a, unsigned short b); virtual ~CMesh(); int n; };
+class CDoor : public CMesh { public: CDoor(); };
+class CPoint { public: CPoint(); Vector v; };
+class CDefault { public: CDefault(); int n = 3; };
+class CEntry { public: ~CEntry(); char pad[12]; };
+"""
+
+
+@pytest.mark.parametrize(("owner", "kind", "why"), [
+    ("CExoLinkedListInternal", "constructor", None),
+    ("CHolder", "constructor", None),                    # scalar, enum and typedef members; statics ignored
+    ("CEntry", "destructor", None),
+    ("CMesh", "constructor", "CMesh has a table pointer"),
+    ("CMesh", "destructor", "CMesh has a table pointer"),
+    ("CDoor", "constructor", "CDoor has bases 'public CMesh'"),
+    ("CPoint", "constructor", "CPoint::v is a Vector, whose default constructor runs first"),
+    ("CDefault", "constructor", "CDefault::n has a default member initializer"),
+    ("CAbsent", "constructor", "CAbsent's definition is not in the slice"),
+])
+def test_naked_special_member_forwards_need_no_implicit_work(owner: str, kind: str, why: str | None) -> None:
+    """A naked constructor still runs the compiler's table, base and member construction, with no frame."""
+    found = bridge.implicit_work(owner, kind, CLASSES)
+    assert found == why if why is None else found.startswith(why)
+
+
+def test_a_bridged_constructor_class_gets_no_table_of_its_own() -> None:
+    body = "class CSWInventory : public CBase {\npublic:\n    CSWInventory();\n};\nvoid f(CSWInventory* p);\n"
+    assert bridge.without_vtable(body, "CSWInventory", Path("x.cpp")).startswith(
+        "class __declspec(novtable) CSWInventory : public CBase {")
+    for constructs in ("CSWInventory* p = new CSWInventory;", "void g() { CSWInventory local; }",
+                       "struct H { CSWInventory member; };"):
+        with pytest.raises(ValueError, match="cannot construct one itself"):
+            bridge.without_vtable(body + constructs, "CSWInventory", Path("x.cpp"))
+
+
+def test_a_forward_may_give_the_signature_symbols_csv_lacks(tmp_path: Path) -> None:
+    """~CExoString shares 005E5C20 with folded destructors: symbols.csv names those only."""
+    u = unit_with(tmp_path, 'extern "C" void __fastcall frame_LogStringDtor_005e5c20(void*, void*) {}', LOAD)
+    spec = bridge.ForwardSpec("frame_LogStringDtor_005e5c20", "public: __thiscall CExoString::~CExoString(void)")
+    body = "class CExoString {\npublic:\n    ~CExoString();                 // 0x005E5C20\n    char* m_sString;\n};"
+    forward = u.forward(0x004BA820, spec, body)
+    assert (forward.function.name, forward.symbol) == ("~CExoString", "frame_LogStringDtor_005e5c20")
+    with pytest.raises(ValueError, match="the slice declares no"):
+        u.forward(0x004BA820, spec, "class CExoString { public: char* m_sString; };")

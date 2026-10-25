@@ -2,6 +2,8 @@
 // change the matched source or src/bridge/bridge.json and regenerate. The byte-identical matched code
 // lives in namespace kotor_bridge_f_surfmesh; only the extern "C" entries at its end are meant to be called.
 namespace kotor_bridge_f_surfmesh {
+#pragma warning(push)
+#pragma warning(disable: 4100 4244)
 // CSWRoomSurfaceMesh and its CExoArrayList instances
 // (b0058_f2_surfmesh_placeable).
 
@@ -146,6 +148,7 @@ int CSWRoomSurfaceMesh::GetAdjacentSecond(int nIndex)
 {
     return m_pPairs[nIndex].m_nSecond;
 }
+#pragma warning(pop)
 
 extern "C" int __fastcall kotor_fastcall_00581150(void* self, void*, int a0)
 {

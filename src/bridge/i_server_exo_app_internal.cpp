@@ -13,6 +13,8 @@ template <class T> using storage = std::remove_cv_t<std::remove_reference_t<T>>;
 namespace kotor_menu_window_cells { extern void* volatile manager_007a39fc; }
 extern "C" unsigned char __fastcall kotor_fastcall_004d8230(void* self, void*, unsigned long a0, void* a1);
 namespace kotor_bridge_i_server_exo_app_internal {
+#pragma warning(push)
+#pragma warning(disable: 4100 4244)
 // CServerExoAppInternal small members (0x004B14F0-0x004B4CF0):
 // module/area caches, the Get*ByGameObjectID family, pause state, player
 // list walks and timers.
@@ -782,10 +784,11 @@ int CServerExoAppInternal::FUN_004b4030()
 
 // NONMATCH (6 insns): the inlined GetActiveExclusionList has the same
 // bit-test/layout difference as 0x004B1DC0 above; the loop matches.
+#pragma warning(pop)
 
-unsigned char CGameObjectArray::GetGameObject(unsigned long a0, CGameObject** a1)
+__declspec(naked) unsigned char CGameObjectArray::GetGameObject(unsigned long, CGameObject**)
 {
-    return kotor_fastcall_004d8230(const_cast<void*>(static_cast<const void*>(this)), nullptr, a0, const_cast<void*>(static_cast<const void*>(a1)));
+    __asm jmp kotor_fastcall_004d8230
 }
 
 extern "C" void* __fastcall kotor_fastcall_004b1740(void* self, void*, unsigned long a0)

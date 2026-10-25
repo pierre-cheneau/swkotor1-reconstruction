@@ -36,6 +36,11 @@ StartupString* as_string(frame_log::String* s) { return reinterpret_cast<Startup
 extern "C" void __fastcall frame_LogStringCtor_005e5a90(frame_log::String* s, void*, const char* text) noexcept(false) {
     ::new (static_cast<void*>(s)) StartupString(text);            // 005E5A90 CExoString(const char*)
 }
+// The same constructor returning the object, as thiscall constructors do: the entry bridged code forwards to.
+extern "C" void* __fastcall kotor_fastcall_005e5a90(frame_log::String* s, void*, const char* text) noexcept(false) {
+    frame_LogStringCtor_005e5a90(s, nullptr, text);
+    return s;
+}
 extern "C" void __fastcall frame_LogStringDtor_005e5c20(frame_log::String* s, void*) {
     as_string(s)->~StartupString();                                // 005E5C20 ~CExoString
 }

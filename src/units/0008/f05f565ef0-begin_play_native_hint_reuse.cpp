@@ -30,6 +30,7 @@ extern "C" {
  unsigned __fastcall recovered_create_server_00401380(void*,void*,unsigned);
  void __fastcall kotor_m15c_main_chargen_remove_sub_panels_006ea830(void*,void*);
  void __fastcall kotor_fastcall_005ee120(void*,void*);
+ int __fastcall kotor_fastcall_004aebe0(void*,void*,void*);
  void* __fastcall frame_R4_005ed690(void*,void*);
  __declspec(noreturn) void __cdecl kotor_unreachable_trap(unsigned long,const char*);
 }
@@ -69,6 +70,9 @@ void connect_005edf00(void*c,unsigned h) override {kotor_m15_client_set_load_scr
 extern "C" void __fastcall kotor_fastcall_006eb320(void* self,void*){Native p;recovered_begin_play::main_begin_006eb320(self,p);}
 
 extern "C" unsigned __fastcall recovered_save_allowed_004b20e0(void*,void*,const recovered_loading_lookup::String* module){LoadingPorts p;return recovered_module_query::save_allowed_004b20e0(module,p);}
+
+// CServerExoAppInternal::GetModulePreviouslyVisited, which the bridged CServerExoApp thunk 004AEBE0 forwards to.
+extern "C" unsigned __fastcall kotor_fastcall_004b51a0(void*,void*,const recovered_loading_lookup::String* module){LoadingPorts p;return recovered_module_query::query_004b51a0(module,p);}
 
 extern "C" unsigned __fastcall recovered_loading_hint_005f4760(void* inner,void*,const recovered_loading_lookup::String* module,unsigned mode){LoadingPorts p;return recovered_loading_lookup::hint_005f4760(inner,module,mode,p);}
 

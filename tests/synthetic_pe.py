@@ -228,9 +228,12 @@ def write_dll(path: Path, exports: list[str], seed: int) -> bytes:
     return image
 
 
-def write_code_image(path: Path, code: bytes) -> None:
-    """An executable whose .text, at the original's 00401000, holds code."""
-    path.write_bytes(_pe([(b".text", 0x401000, len(code), code, 0x60000020)], {}, dll=False))
+def write_code_image(path: Path, code: bytes, rdata: bytes = b"") -> None:
+    """An executable whose .text, at the original's 00401000, holds code; rdata, if any, follows as .rdata."""
+    sections = [(b".text", 0x401000, len(code), code, 0x60000020)]
+    if rdata:
+        sections.append((b".rdata", 0x401000 + (len(code) + 0xFFF & ~0xFFF), len(rdata), rdata, 0x40000040))
+    path.write_bytes(_pe(sections, {}, dll=False))
 
 
 MSS32_EXPORTS = ["_AIL_quick_handles@12", "_AIL_startup@0", "AIL_debug_printf", "_AIL_set_preference@8"]

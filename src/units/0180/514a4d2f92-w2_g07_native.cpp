@@ -96,6 +96,13 @@ std::int32_t __fastcall recovered_gui_in_game_get_current_equip_screen_npc_0062f
 // W1 tier6 reputation set (t4b ruling: W1 owns 0057CB80, 0052B280, 0052B420, 00513FF0 and cell 007A2068)
 unsigned __fastcall recovered_object_get_reputation_0057cb80(void*, void*, unsigned, unsigned);
 unsigned __fastcall recovered_faction_is_npc_0052b280(void*, void*, unsigned);
+// CSWSCreatureStats::GetTotal{STR,DEX,CON,INT,WIS,CHA}Bonus: byte-identical matched code (src/bridge)
+char __fastcall kotor_fastcall_005a58b0(void*, void*);
+char __fastcall kotor_fastcall_005a58e0(void*, void*);
+char __fastcall kotor_fastcall_005a5910(void*, void*);
+char __fastcall kotor_fastcall_005a5940(void*, void*);
+char __fastcall kotor_fastcall_005a5970(void*, void*);
+char __fastcall kotor_fastcall_005a59a0(void*, void*);
 unsigned __fastcall recovered_creature_total_effect_bonus_004f3fe0(void*, void*, unsigned, unsigned, unsigned, unsigned, unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);   // W2 single 004F3FE0 entry (t4b)
 }
 
@@ -314,6 +321,7 @@ struct NCharSheet final : g::CharSheetPorts {
     W2_BUNDLE_PORT(NCharSheet)
     [[noreturn]] void trap(Word a, const char* w) override { ntrap(a, w); }
     Word effect_bonus_004f3fe0(Word c, Word a1, Word a2, Word a3, Word a4, Word a5, Word a6, Word a7, Word a8, Word a9, Word a10) override;
+    Word total_ability_bonus_005a58b0(Word stats, Word ability) override;
     Word is_debilitated_005b4880(Word c) override { return w5x_creature_is_debilitated_005b4880(ptr(c), nullptr); }
     Word item_in_slot_005a4c20(Word inv, Word slot) override { return word(recovered_equipment_item_005a4c20(ptr(inv), nullptr, slot)); }
     Word item_base_item_005b4790(Word i) override { return word(kotor_m15b_item_get_base_item_005b4790(ptr(i), nullptr)); }
@@ -485,6 +493,13 @@ void NPartyUpdate::active_item_properties_00566f20(Word self, Word item, Word c)
 // ---- NCharSheet: 004F3FE0 GetTotalEffectBonus is bound per case (only the owned specialisations exist)
 Word NCharSheet::effect_bonus_004f3fe0(Word c, Word a1, Word a2, Word a3, Word a4, Word a5, Word a6, Word a7, Word a8, Word a9, Word a10) {
     return recovered_creature_total_effect_bonus_004f3fe0(ptr(c), nullptr, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10);   // the single W2 entry
+}
+Word NCharSheet::total_ability_bonus_005a58b0(Word stats, Word ability) {
+    using Getter = char(__fastcall*)(void*, void*);
+    static constexpr Getter kGetters[] = {kotor_fastcall_005a58b0, kotor_fastcall_005a58e0, kotor_fastcall_005a5910,
+                                          kotor_fastcall_005a5940, kotor_fastcall_005a5970, kotor_fastcall_005a59a0};
+    if (ability >= 6) ntrap(0x005a58b0, "GetTotal*Bonus: ability index");
+    return static_cast<unsigned char>(kGetters[ability](ptr(stats), nullptr));
 }
 Word NCharSheet::get_class_005a4e90(Word s, Word i) { return b.klass(s, i); }
 // ---- NPlayer / NPlayerLast: stat getters are w2_g07_charsheet bodies

@@ -6,6 +6,8 @@
 #include <type_traits>
 extern "C" const void* const kotor_vtable_cswinventory_0074a824[];
 namespace kotor_bridge_f_inventory {
+#pragma warning(push)
+#pragma warning(disable: 4100 4244)
 // CSWInventory equipment slots (0x005A4930-0x005A4C20).
 
 class CSWSItem {
@@ -28,7 +30,7 @@ public:
 
 extern CAppManager *g_pAppManager;
 
-class CSWInventory {
+class __declspec(novtable) CSWInventory {
 public:
     CSWInventory();
     virtual ~CSWInventory() {}
@@ -96,6 +98,16 @@ unsigned long *CSWInventory::GetItemSlotPtr(unsigned long nSlot)
     }
 }
 
+
+// FUNCTION: SWKOTOR 0x005A4BE0
+void CSWInventory::PutItemInSlot(unsigned long nSlot, CSWSItem *pItem)
+{
+    unsigned long *pSlot = GetItemSlotPtr(nSlot);
+    if (pSlot)
+        *pSlot = pItem->m_idSelf;
+}
+#pragma warning(pop)
+
 extern "C" void* __fastcall kotor_fastcall_005a4930(void* self, void*)
 {
     static_assert(std::is_polymorphic<CSWInventory>::value, "a vtable is bound");
@@ -107,6 +119,11 @@ extern "C" void* __fastcall kotor_fastcall_005a4930(void* self, void*)
 extern "C" unsigned long* __fastcall kotor_fastcall_005a49c0(void* self, void*, unsigned long a0)
 {
     return static_cast<CSWInventory*>(self)->GetItemSlotPtr(a0);
+}
+
+extern "C" void __fastcall kotor_fastcall_005a4be0(void* self, void*, unsigned long a0, void* a1)
+{
+    static_cast<CSWInventory*>(self)->PutItemInSlot(a0, static_cast<CSWSItem*>(a1));
 }
 
 }  // namespace kotor_bridge_f_inventory

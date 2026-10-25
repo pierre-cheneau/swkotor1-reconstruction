@@ -24,6 +24,9 @@ namespace frame_control { extern unsigned message_manager_007a3a00; }
 namespace kotor_menu_window_cells { extern void* volatile manager_007a39fc; }
 namespace kotor::server_mainloop { Word creature_get_class_005a4e90(Memory&, Word stats, Word index); }   // 0982
 extern "C" unsigned __fastcall recovered_stats_class_level_005a5090(void*, void*, unsigned, unsigned);   // W2 t4 (hard import, t6)
+// CExoArrayList<CSWSTagNode>::Insert: byte-identical matched code (src/bridge); its CSWSTagNode passes by value.
+namespace bridged_tag { struct Node { unsigned char bytes[40]; }; }
+extern "C" void __fastcall kotor_fastcall_004c6520(void*, void*, bridged_tag::Node, int);
 extern "C" {
 void* __cdecl live_operator_new(std::uint32_t);
 void __cdecl live_free(void*);
@@ -102,6 +105,7 @@ struct TagPorts final : recovered_module_tag::Ports {
   U text(U a) override { return word(WindowCStr005e5670(ptr(a), nullptr)); }
   U equal(U a, U b) override { return static_cast<U>(static_cast<StartupString*>(ptr(a))->BorrowedEquals005e5290(static_cast<const char*>(ptr(b)))); }
   void destroy(U a) override { exo_destroy(ptr(a)); }
+  void insert_004c6520(U list, U node, U index) override { bridged_tag::Node n; std::memcpy(&n, ptr(node), sizeof n); kotor_fastcall_004c6520(ptr(list), nullptr, n, static_cast<int>(index)); }
 };
 }
 

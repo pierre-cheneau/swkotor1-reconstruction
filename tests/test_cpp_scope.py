@@ -85,3 +85,41 @@ def test_top_level_const(words, const) -> None:
 def test_unbalanced_braces_are_refused() -> None:
     with pytest.raises(ValueError, match="Unbalanced"):
         list(cpp_scope.statements("int f() { return 1;\n"))
+
+
+FUNCTIONS = """
+extern "C" {
+unsigned __fastcall block_00000001(void*, void*);
+void __fastcall defined_00000002(void*, void*, unsigned, int) noexcept(false) { x(); }
+}
+extern "C" __declspec(noreturn) void __cdecl trap(unsigned long, const char*);
+extern "C" std::uint32_t __fastcall qualified_00000003(Space::String* self, void*) { return 0; }
+namespace { extern "C" int __fastcall hidden(void*, void*) { return 0; } }
+static int internal(void) { return 1; }
+int Owner::member(int) { return 2; }
+int (*pointer)(int);
+template <class T> void generic(T);
+std::vector<int> listed(std::map<int, int> const& m);
+"""
+
+
+@pytest.mark.parametrize(("name", "returns", "convention", "params", "defined", "external", "c_linkage"), [
+    ("block_00000001", "unsigned", "__fastcall", ("void*", "void*"), False, True, True),
+    ("defined_00000002", "void", "__fastcall", ("void*", "void*", "unsigned", "int"), True, True, True),
+    ("trap", "void", "__cdecl", ("unsigned long", "const char*"), False, True, True),
+    ("qualified_00000003", "std::uint32_t", "__fastcall", ("Space::String* self", "void*"), True, True, True),
+    ("hidden", "int", "__fastcall", ("void*", "void*"), True, False, True),
+    ("internal", "int", "", (), True, False, False),
+    ("listed", "std::vector < int >", "", ("std::map < int , int > const& m",), False, True, False),
+])
+def test_functions_carry_linkage_convention_and_parameters(name, returns, convention, params, defined, external,
+                                                           c_linkage) -> None:
+    found = {f.name: f for f in map(cpp_scope.functions, cpp_scope.statements(FUNCTIONS)) if f}
+    f = found[name]
+    assert (f.returns, f.convention, f.params, f.defined, f.external, f.statement.c_linkage) == \
+        (returns, convention, params, defined, external, c_linkage)
+
+
+def test_members_pointers_and_templates_are_not_plain_functions() -> None:
+    names = {f.name for f in map(cpp_scope.functions, cpp_scope.statements(FUNCTIONS)) if f}
+    assert not names & {"member", "pointer", "generic"}

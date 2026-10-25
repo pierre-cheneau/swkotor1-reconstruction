@@ -21,6 +21,8 @@ struct CharSheetPorts {
     [[noreturn]] virtual void trap(Word address, const char* what) = 0;
     // CSWSCreature::GetTotalEffectBonus 004F3FE0 (thiscall, 10 stack args, RET 28h); EAX returned raw
     virtual Word effect_bonus_004f3fe0(Word creature, Word a1, Word a2, Word a3, Word a4, Word a5, Word a6, Word a7, Word a8, Word a9, Word a10) = 0;
+    // CSWSCreatureStats::GetTotal{STR,DEX,CON,INT,WIS,CHA}Bonus 005A58B0 + 0x30 * ability (thiscall, RET 0); AL returned
+    virtual Word total_ability_bonus_005a58b0(Word stats, Word ability) = 0;
     virtual Word is_debilitated_005b4880(Word creature) = 0;
     virtual Word item_in_slot_005a4c20(Word inventory, Word slot) = 0;
     virtual Word item_base_item_005b4790(Word item) = 0;

@@ -58,6 +58,17 @@ class Variable:
     statement: Statement
 
 
+@dataclass(frozen=True)
+class Function:
+    name: str
+    returns: str                      # the return type, without storage specifiers or calling convention
+    convention: str                   # "__fastcall", "__cdecl", ... or "" for the default
+    params: tuple[str, ...]           # parameter declarations as written, () for none or (void)
+    defined: bool                     # has a body
+    external: bool                    # external linkage
+    statement: Statement
+
+
 def tokens(text: str) -> list[Token]:
     """Tokens with their offsets in text; preprocessor lines are blanked first, so offsets hold."""
     text = DIRECTIVE.sub(lambda m: re.sub(r"[^\n]", " ", m.group()), text)
@@ -188,6 +199,72 @@ def variables(s: Statement) -> Variable | None:
     source = s.text[initializer[0].start - s.start:initializer[-1].end - s.start] if initializer else ""
     return Variable(name, spell(type_words), "".join(bounds), initialized or not extern, not internal,
                     "&" in type_words, source, s)
+
+
+CONVENTIONS = {"__fastcall", "__cdecl", "__stdcall", "__thiscall", "__vectorcall"}
+
+
+def functions(s: Statement) -> Function | None:
+    """The statement's function, when it declares or defines exactly one plain (non-template, non-member,
+    non-operator) function: 'extern "C" int __fastcall f(void* self, void*) noexcept(false) { ... }'."""
+    items = without_declspecs(s.tokens)
+    words = [t.text for t in items]
+    if not words or words[0] in SKIPPED or words[-1] not in {";", "{}"} or "operator" in words or "(" not in words:
+        return None
+    opening = words.index("(")
+    closing_ = opening + matching_paren(words[opening:])
+    if closing_ < opening or opening < 2 or not re.fullmatch(r"[A-Za-z_]\w*", words[opening - 1]):
+        return None
+    prefix, tail = words[:opening - 1], words[closing_ + 1:]
+    if prefix[:2] == ["extern", '"C"']:
+        prefix = ["extern", *prefix[2:]]
+    if prefix[-1:] == ["::"] or any(w in {"=", ",", "(", ")", "{}"} for w in prefix):
+        return None                     # members defined out of class, initializers, pointers to functions
+    if any(w not in {"noexcept", "(", ")", "false", "true", "throw", ";", "{}"} for w in tail) or "{}" in tail[:-1]:
+        return None                     # trailing return types, attributes, initializer lists
+    convention = [w for w in prefix if w in CONVENTIONS]
+    type_words = [w for w in prefix if w not in SPECIFIERS and w not in CONVENTIONS]
+    if len(convention) > 1 or not type_words:
+        return None
+    inner = words[opening + 1:closing_]
+    params = () if inner in ([], ["void"]) else tuple(spell(group) for group in split_top(inner))
+    return Function(words[opening - 1], spell(type_words), "".join(convention), params, words[-1] == "{}",
+                    "static" not in prefix and not s.anonymous, s)
+
+
+def without_declspecs(items: tuple[Token, ...]) -> list[Token]:
+    """items without '__declspec( ... )' groups."""
+    out, i = [], 0
+    while i < len(items):
+        if items[i].text == "__declspec" and i + 1 < len(items) and items[i + 1].text == "(":
+            i += 1 + matching_paren([t.text for t in items[i + 1:]]) + 1
+            continue
+        out.append(items[i])
+        i += 1
+    return out
+
+
+def matching_paren(words: list[str]) -> int:
+    """Index of the parenthesis closing words[0], or -1."""
+    depth = 0
+    for j, w in enumerate(words):
+        depth += (w == "(") - (w == ")")
+        if depth == 0:
+            return j
+    return -1
+
+
+def split_top(words: list[str]) -> list[list[str]]:
+    """Parameter words grouped at top-level commas (template arguments included)."""
+    groups: list[list[str]] = [[]]
+    depth = 0
+    for w in words:
+        depth += (w in {"(", "[", "<"}) - (w in {")", "]", ">"})
+        if w == "," and depth == 0:
+            groups.append([])
+        else:
+            groups[-1].append(w)
+    return groups
 
 
 def spell(words: list[str]) -> str:

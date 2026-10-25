@@ -2,6 +2,8 @@
 // change the matched source or src/bridge/bridge.json and regenerate. The byte-identical matched code
 // lives in namespace kotor_bridge_d_res_ref; only the extern "C" entries at its end are meant to be called.
 namespace kotor_bridge_d_res_ref {
+#pragma warning(push)
+#pragma warning(disable: 4100 4244)
 // CResRef members.
 // ---- matching/include/d/exo_key_table.h
 // CExoKeyTable, CExoResMan key lookups and the resource-file
@@ -632,6 +634,7 @@ unsigned char CResRef::GetLength() const
     }
     return i;
 }
+#pragma warning(pop)
 
 extern "C" unsigned char __fastcall kotor_fastcall_00406040(void* self, void*)
 {

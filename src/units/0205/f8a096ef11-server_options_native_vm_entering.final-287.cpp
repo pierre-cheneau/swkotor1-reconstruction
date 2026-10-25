@@ -1,4 +1,5 @@
 extern "C" void* __fastcall recovered_rules_server_construct_0057a1f0(void*,void*);   // W1 tier9
+extern "C" void* __fastcall kotor_fastcall_004af260(void*,void*);   // CExoLinkedList<CServerAIEventNode> ctor: matched (src/bridge)
 extern "C" int __fastcall recovered_vm_get_entering_object_00537ee0(void*,void*,int,unsigned);
 extern "C" int __fastcall recovered_vm_get_is_pc_0053f1c0(void*,void*,int,unsigned);
 extern "C" int __fastcall recovered_vm_execute_command_0052c0d0(void*,void*,int,unsigned);
@@ -226,6 +227,7 @@ struct Ai:recovered_ai_construct::Ports{
  const void*table2()override{return &ai_table_00744284;}
  void initialize_table1(void*s)override{auto*t=static_cast<const AiEntry*>(readptr(s,0));t[1](s,nullptr);}
  void initialize_table2(void*s)override{auto*t=static_cast<const AiEntry*>(readptr(s,0));t[1](s,nullptr);}
+ void event_queue(void*list)override{kotor_fastcall_004af260(list,nullptr);}
 };
 #include "c7026f3d03-vm_commands_native_entering.inc"
 extern "C" int __fastcall recovered_vm_action_start_conversation_0052d5b0(void*,void*,int,unsigned);

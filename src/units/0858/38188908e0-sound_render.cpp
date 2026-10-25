@@ -11,6 +11,7 @@
 #include <cstring>
 
 extern "C" std::uint32_t __stdcall unresolved_GetTickCount_005ec200();          // world-timer-os-imports.obj
+extern "C" int __fastcall kotor_fastcall_005d6cc0(void*, void*, void*);       // CExoLinkedList<CExoSoundSourceInternal>::Contains: matched (src/bridge)
 namespace add_key_lower { void __fastcall Remove005e9c10(kotor_list::Internal*, void*, void*); } // remove_position.obj
 namespace sound_pause29_required { std::uint32_t __stdcall zero_0063e7f0(); }    // joined to 0063E7F0 body
 namespace menu_resources { struct Ref; }
@@ -253,7 +254,7 @@ void __fastcall Render005d9590(void* self, void*) {
         if (!sound_lower29::ActorPlaying005db0e0(src, nullptr)) {   // 005DA279-005DA283
             pos = bp(kotor_sound_path_required::remove_playing_005d78f0(self, nullptr, src)); // 005DA289-005DA298
             if (rd(src, 0x28)) {                                    // 005DA29B-005DA2A5 (005D64F0)
-                if (!ListContains005e9d40(L(self, 0x48), nullptr, src) && src) destroy_source(src); // 005DA2A7-005DA2F5
+                if (!kotor_fastcall_005d6cc0(static_cast<char*>(self) + 0x48, nullptr, src) && src) destroy_source(src); // 005DA2A7-005DA2F5
                 src = nullptr;                                      // 005DA2FF
             } else if (sound_pause29_required::zero_0063e7f0() == 0) { // 005DA308-005DA312 (ECX=src ignored)
                 kotor_sound_path_required::shutdown_source_005db210(src, nullptr); // 005DA317
@@ -265,9 +266,9 @@ void __fastcall Render005d9590(void* self, void*) {
             pos = bp(kotor_sound_path_required::remove_playing_005d78f0(self, nullptr, src)); // 005DA34C-005DA35B
             if (rd(src, 0x28)) {                                    // 005DA35E-005DA368
                 if (sound_lower29::ActorPlaying005db0e0(src, nullptr)) { // 005DA36E-005DA378
-                    if (!ListContains005e9d40(L(self, 0x48), nullptr, src)) // 005DA37A-005DA38E
+                    if (!kotor_fastcall_005d6cc0(static_cast<char*>(self) + 0x48, nullptr, src)) // 005DA37A-005DA38E
                         ini_addhead::AddHead005e9d70(L(self, 0x48), nullptr, src); // 005DA390-005DA39D (005D6CB0)
-                } else if (!ListContains005e9d40(L(self, 0x48), nullptr, src) && src) { // 005DA3A4-005DA3D6
+                } else if (!kotor_fastcall_005d6cc0(static_cast<char*>(self) + 0x48, nullptr, src) && src) { // 005DA3A4-005DA3D6
                     destroy_source(src);                            // 005DA3D8-005DA3E8
                 }
                 src = nullptr;                                      // 005DA3FC

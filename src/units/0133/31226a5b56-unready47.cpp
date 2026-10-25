@@ -429,7 +429,6 @@ U end_combat_round_004d4620(U self, U flag, Ports& p) {
 namespace kotor_menu_window_cells { extern void* volatile manager_007a39fc; }
 namespace menu_list_growth { void __fastcall allocate_005e03c0(kotor_reconstruction::ArrayMutations*, void*, unsigned); }
 namespace ini_comparison { int __fastcall CompareNC005e58c0(kotor_reconstruction::StartupString*, void*, const char*); }
-namespace recovered_server_create { void* __cdecl construct_list_internal_005e9aa0(void*); }
 
 namespace unready47_setup {
 
@@ -440,6 +439,7 @@ inline Word word(void* p) { return static_cast<Word>(reinterpret_cast<std::uintp
 
 extern "C" void* __cdecl live_operator_new(unsigned);
 extern "C" void __cdecl live_free(void*);
+extern "C" void* __fastcall kotor_fastcall_004d2f30(void*, void*);   // CExoLinkedList<CSWSCombatRoundAction> ctor: matched (src/bridge)
 extern "C" void* kotor_cell_rules_007a3a28;
 
 extern "C" unsigned __fastcall gff_list_count_00411940(void*, void*, void*);
@@ -551,13 +551,12 @@ struct SetupCombatMemory : recovered_combat_round::Ports {
     void string(Word a) override { write(a, 0); write(a + 4, 0); }
     void empty(Word a) override;
     Word allocate(Word n) override { return word(live_operator_new(n)); }
-    Word list(Word a) override;
+    void scheduled_list_004d2f30(Word a) override { kotor_fastcall_004d2f30(ptr(a), nullptr); }
     void effect_destroy(Word a) override;
     void release(Word a) override { live_free(ptr(a)); }
 };
 
 void SetupCombatMemory::empty(Word a) { GuiAssign005e5140(ptr(a), nullptr, ""); }
-Word SetupCombatMemory::list(Word a) { return word(::recovered_server_create::construct_list_internal_005e9aa0(ptr(a))); }
 void SetupCombatMemory::effect_destroy(Word a) { recovered_effect_destroy_00503590(ptr(a), nullptr); }
 
 } // namespace unready47_setup

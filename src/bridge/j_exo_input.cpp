@@ -2,6 +2,8 @@
 // change the matched source or src/bridge/bridge.json and regenerate. The byte-identical matched code
 // lives in namespace kotor_bridge_j_exo_input; only the extern "C" entries at its end are meant to be called.
 namespace kotor_bridge_j_exo_input {
+#pragma warning(push)
+#pragma warning(disable: 4100 4244)
 // CExoInput, the public facade that forwards every call to its
 // CExoInputInternal (+0x04). 0x005DF3F0-0x005DF730.
 // ---- matching/include/j/exo_input.h
@@ -264,6 +266,7 @@ int CExoInput::GetLastSetMouseDownState()
 {
     return m_pInternal->m_bLastSetMouseDownState;
 }
+#pragma warning(pop)
 
 extern "C" int __fastcall kotor_fastcall_005df730(void* self, void*)
 {

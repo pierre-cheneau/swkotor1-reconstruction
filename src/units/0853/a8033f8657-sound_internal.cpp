@@ -322,3 +322,8 @@ U __fastcall Initialize005da8a0(void* self, void*, U voices2d, U voices3d, U eax
     return ok ? 1u : 0u;
 }
 }
+
+// The entry the bridged CExoLinkedList<CExoSoundSourceInternal>::Contains (005D6CC0) forwards to.
+extern "C" std::uint32_t __fastcall kotor_fastcall_005e9d40(void* internal, void*, void* data) {
+    return kotor_sound_internal::ListContains005e9d40(internal, nullptr, data);
+}

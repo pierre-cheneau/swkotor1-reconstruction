@@ -77,3 +77,7 @@ void* construct_embedded_00563d20(void* object) {
  return s;
 }
 }
+// CExoLinkedListInternal::CExoLinkedListInternal, which the bridged CExoLinkedList<T> constructors forward to.
+extern "C" void* __fastcall kotor_fastcall_005e9aa0(void* self, void*) {
+ return recovered_server_create::construct_list_internal_005e9aa0(self);
+}

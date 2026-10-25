@@ -39602,7 +39602,97 @@
           ]
         },
         {
+          "source": "src/bridge/a_sws_combat_round.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
           "source": "src/bridge/a_sws_creature_broadcast.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/b_global_variable_table.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/b_server_misc.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/b_sws_item.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/b_sws_item3.cpp",
           "compiler": "msvc",
           "flags": [
             "/nologo",
@@ -39638,7 +39728,97 @@
           ]
         },
         {
+          "source": "src/bridge/c_client_exo_app_internal.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/c_client_exo_app_internal_r5.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/c_exo_facade_r7.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/c_exo_loc_string_internal.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
           "source": "src/bridge/d_res_ref.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/f_door_trigger.cpp",
           "compiler": "msvc",
           "flags": [
             "/nologo",
@@ -39674,7 +39854,61 @@
           ]
         },
         {
+          "source": "src/bridge/f_stats_getters.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
           "source": "src/bridge/f_surfmesh.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/i_server_ai_master.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/i_server_exo_app.cpp",
           "compiler": "msvc",
           "flags": [
             "/nologo",
@@ -39710,7 +39944,43 @@
           ]
         },
         {
+          "source": "src/bridge/i_sws_module.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
           "source": "src/bridge/j_exo_input.cpp",
+          "compiler": "msvc",
+          "flags": [
+            "/nologo",
+            "/O2",
+            "/Ob0",
+            "/Oy-",
+            "/GS",
+            "/EHsc",
+            "/MT",
+            "/W4",
+            "/WX",
+            "/std:c++17",
+            "/showIncludes",
+            "/D_CRT_SECURE_NO_WARNINGS"
+          ]
+        },
+        {
+          "source": "src/bridge/j_exo_sound_list.cpp",
           "compiler": "msvc",
           "flags": [
             "/nologo",
@@ -39983,7 +40253,7 @@
         },
         {
           "path": "src/units/0007/31d1a4213d-client_status_native.cpp",
-          "sha256": "d635871fb77427f826afd3063959803c9ce44a4f3d96097e6b62d62fb3044dd0"
+          "sha256": "ee506515d25d8db02ed3b9662a4224e466bffa275821a07709a679350bcbf8ff"
         },
         {
           "path": "src/units/0007/814d0b39ed-player_message.hpp",
@@ -40003,7 +40273,7 @@
         },
         {
           "path": "src/units/0008/65283e0453-post_save_native.inc",
-          "sha256": "044e3eec0d6631db85f3fbf1657de9204c11b761d356b9379814ce5baf8166f9"
+          "sha256": "d5bc7c8ac2ed2e7955228f74e7c549add1cc83713ebf84dd9d2b4fc52f9d4f3d"
         },
         {
           "path": "src/units/0008/7765cc0e84-begin_play.hpp",
@@ -40043,7 +40313,7 @@
         },
         {
           "path": "src/units/0008/f05f565ef0-begin_play_native_hint_reuse.cpp",
-          "sha256": "f8258e39fa647b52a14c2550cccadda5db15611093ab853d51e11397ff8e0596"
+          "sha256": "46cef02c43c70fb186dce6ca2c813023e2ba9e0677b92e50ed0a475382570f15"
         },
         {
           "path": "src/units/0008/fea6560366-server_mainloop.hpp",
@@ -42815,7 +43085,7 @@
         },
         {
           "path": "src/units/0133/31226a5b56-unready47.cpp",
-          "sha256": "cca68cce576a498e7fb339c9c620dd20c186307b4acb1b01d4893f35fefbbb70"
+          "sha256": "06eaf32c49e5ab2295f8a03705c6e81f25784391164070063a0e5e74c1ef32ff"
         },
         {
           "path": "src/units/0133/4512f576a5-server_mainloop.hpp",
@@ -42827,7 +43097,7 @@
         },
         {
           "path": "src/units/0133/b0b49a4ad4-combat_constructor.hpp",
-          "sha256": "f8e8d139394571ce02c2748e69a6982e53b7d40fa0f807187e825e55dc50d4e2"
+          "sha256": "f789b39fc854856da87fbce519fc2418edcc593c4e00c42a1556ee3a5a64dce0"
         },
         {
           "path": "src/units/0133/b4f8afa3dd-perception.hpp",
@@ -43651,7 +43921,7 @@
         },
         {
           "path": "src/units/0176/04843df76a-w2_g07_charsheet.hpp",
-          "sha256": "b6e4e0f3fb9a6112d7f6d0b5559ef8cb6d9d42341c25cf59791b317d830722fd"
+          "sha256": "6832aedbc5b6dc98114d51f97283233672716af1fb34e57cf5446a0b6b1f7b9c"
         },
         {
           "path": "src/units/0176/1e16cfcf3d-server_mainloop.hpp",
@@ -43659,7 +43929,7 @@
         },
         {
           "path": "src/units/0176/5db7f613b0-w2_g07_charsheet.cpp",
-          "sha256": "7319f3e6834d300829e21f3416801e20241be5a13b8bc1e67945d6a3228a2eab"
+          "sha256": "9bf2073840606dd677d5c13c291dc4f52935eab7d5a0e59ca81bf1cadd104ed2"
         },
         {
           "path": "src/units/0176/72239a78a7-w2_entry.hpp",
@@ -43719,7 +43989,7 @@
         },
         {
           "path": "src/units/0180/04843df76a-w2_g07_charsheet.hpp",
-          "sha256": "b6e4e0f3fb9a6112d7f6d0b5559ef8cb6d9d42341c25cf59791b317d830722fd"
+          "sha256": "6832aedbc5b6dc98114d51f97283233672716af1fb34e57cf5446a0b6b1f7b9c"
         },
         {
           "path": "src/units/0180/1e16cfcf3d-server_mainloop.hpp",
@@ -43747,7 +44017,7 @@
         },
         {
           "path": "src/units/0180/514a4d2f92-w2_g07_native.cpp",
-          "sha256": "50f159960b274fbf37d53872f3e969319ddb18abba53d0d9351f05eded72e001"
+          "sha256": "3fd3840cedb841adedde8d46e836f3c7d2cf6d7c2287599a448871366b1327b1"
         },
         {
           "path": "src/units/0180/51971a08a7-w2_g07_appearance.hpp",
@@ -43999,7 +44269,7 @@
         },
         {
           "path": "src/units/0194/4d916f71f6-module_tag.hpp",
-          "sha256": "7df5c3d49a0a8561d473148171be3d8287c712612b6fe378f37b898ad8a8c365"
+          "sha256": "6bbd742fc4577a978ecd3a94752f71ff7ce5aa77d3a6dff789c34821bba5311c"
         },
         {
           "path": "src/units/0194/73dbba025f-vm_actions_t1.hpp",
@@ -44007,15 +44277,15 @@
         },
         {
           "path": "src/units/0194/92dc5c164d-vm_actions_t3.cpp",
-          "sha256": "2ac1f4cf721ee147874c949a6269ed8ee80e61f1d7d07e7d8c66ecfc737c5226"
+          "sha256": "a9d69b70cae523fdf420ae6a86519f8abad49af3f2e1b3d6ff7952e8b6dd3c41"
         },
         {
           "path": "src/units/0194/9f6f5e8482-global_catalog.hpp",
-          "sha256": "6de867e8861ed8e2aec922456efb32bcee0123c3f38997dc6cccacfa9889f1df"
+          "sha256": "26d7035e9962b07b3f4c10a17ef15d58e3bd74aff6fd4981b1030771598dec72"
         },
         {
           "path": "src/units/0195/4d916f71f6-module_tag.hpp",
-          "sha256": "7df5c3d49a0a8561d473148171be3d8287c712612b6fe378f37b898ad8a8c365"
+          "sha256": "6bbd742fc4577a978ecd3a94752f71ff7ce5aa77d3a6dff789c34821bba5311c"
         },
         {
           "path": "src/units/0195/73dbba025f-vm_actions_t1.hpp",
@@ -44023,7 +44293,7 @@
         },
         {
           "path": "src/units/0195/d041a802fb-vm_actions_t4.cpp",
-          "sha256": "4f103dc0a1020eebb1a10d4f76bc9015a902430a59ce751bb52199d81c63ab42"
+          "sha256": "f9ce22d1ed1741211bf6f94f7bd7aa02c116f71c60fb530cbbbb89de826a2465"
         },
         {
           "path": "src/units/0195/d09f202cd1-vm_actions_t4.hpp",
@@ -44187,7 +44457,7 @@
         },
         {
           "path": "src/units/0205/f8a096ef11-server_options_native_vm_entering.final-287.cpp",
-          "sha256": "c3441100f4dead282c1df301f82785bcf29b9d0d9f12fffe7dbef379c3ab3959"
+          "sha256": "f0819e14d773635484b0ad9bf0a5e14ffafcaf26a2dc6e6a34f07921c92136b9"
         },
         {
           "path": "src/units/0205/fb62d9a6ef-options_leaf.hpp",
@@ -44199,7 +44469,7 @@
         },
         {
           "path": "src/units/0205/fed6008d14-ai_construct.hpp",
-          "sha256": "68f76936902d9773fb3f90efbac6c11ca406503eabca6fa8e2458813e93ac7c2"
+          "sha256": "261f580b60bcee1a83c70cb01f70faf32b97dd61932fc2a875f2e1dd0eb15c07"
         },
         {
           "path": "src/units/0206/2f4dbc970e-player_message_native.cpp",
@@ -46739,7 +47009,7 @@
         },
         {
           "path": "src/units/0296/04f2ee1511-string_priority.cpp",
-          "sha256": "005f607e64b8ffb41b6d0ff463f24e69a279fec4662debb65676712726618431"
+          "sha256": "91c1a8b3f2929a4859cb240dcad25868150174564c9129048dd344a4db386048"
         },
         {
           "path": "src/units/0296/0f2c9decb2-string_priority.h",
@@ -60923,7 +61193,7 @@
         },
         {
           "path": "src/units/0648/403917ff29-r4_log_joins.cpp",
-          "sha256": "8548eee100eaf33f952a5902b1b897618284930d06326d2b780deab6524192f3"
+          "sha256": "084fc76c627d2a854ecac7c6baa2ba0953a32e2280fd67dcde40f38de8b1c091"
         },
         {
           "path": "src/units/0648/4ff7034f3a-mainloop.h",
@@ -68511,7 +68781,7 @@
         },
         {
           "path": "src/units/0853/a8033f8657-sound_internal.cpp",
-          "sha256": "5890398fa7625195557ad0b9fba5569c8b4037c3f18796caf48b0ba9344a031b"
+          "sha256": "20a73a8685b3b0e9b1d0a6b212cc6564f23de5b3b3d494c43dfedebccc9eeb9e"
         },
         {
           "path": "src/units/0853/e2581310e3-sound_internal.h",
@@ -68675,7 +68945,7 @@
         },
         {
           "path": "src/units/0858/38188908e0-sound_render.cpp",
-          "sha256": "d6b032f8d895732810cb71b03803af9ae8b3dfff11ed7ee1b6251a64dae837bf"
+          "sha256": "f1b24d9b2c5303ae2e2e6c1fed9a1bf30595896f4efaf40c136d3cfc0811d4bd"
         },
         {
           "path": "src/units/0858/e2581310e3-sound_internal.h",
@@ -73327,7 +73597,7 @@
         },
         {
           "path": "src/units/1043/884db017d1-gff_writer_native_live.cpp",
-          "sha256": "031a3636dbbd0596d5ee674e525f67b8191827e2cf695fc979a10213afde46b6"
+          "sha256": "7661a7ca18e91fd291c3533120016ba794d6c417598c3f3e13169586e5b55284"
         },
         {
           "path": "src/units/1043/98f9874dbc-gff_write_core.hpp",
@@ -73403,7 +73673,7 @@
         },
         {
           "path": "src/units/1167/b447bd3a22-item_fields_native_tag.cpp",
-          "sha256": "7348864ecdbd2e027d200fb36f4b9e1e84a4c7de7038c9ed96c148baa063145e"
+          "sha256": "5138cfe17fd6afcec6704521b361733907909c8b9bc99ef465f4613bf1f9b408"
         },
         {
           "path": "src/units/1167/edcc3b7869-item_identity.hpp",
@@ -73471,7 +73741,7 @@
         },
         {
           "path": "src/units/1202/7e67b6e29b-item_equip_apply_native_weight.cpp",
-          "sha256": "0b48338967ed0c7f5c324d71edf5db4cd9d392b6ac4d421bee53c7d6b28c9707"
+          "sha256": "9f58800febd62e2e3f17efc2fad0a4d99aa1734bcf45b37a67acb3b7fcede0c0"
         },
         {
           "path": "src/units/1202/8ee512c4f6-item_property_dispatch.hpp",
@@ -73643,7 +73913,7 @@
         },
         {
           "path": "src/units/1282/d8a8ff2b82-door_placement_native_bounds_export.cpp",
-          "sha256": "2d7eebb0395b70aff1680f6dc8441b55b2ae0c02b092941a8dce4571fd86d3ed"
+          "sha256": "cd14d7e13732a273bbe7f21151f803138f8f1b758723fcae73cb6534dbabd41a"
         },
         {
           "path": "src/units/1301/50af928f4c-creature_area_access.hpp",
@@ -73831,7 +74101,7 @@
         },
         {
           "path": "src/units/1368/9f6f5e8482-global_catalog.hpp",
-          "sha256": "6de867e8861ed8e2aec922456efb32bcee0123c3f38997dc6cccacfa9889f1df"
+          "sha256": "26d7035e9962b07b3f4c10a17ef15d58e3bd74aff6fd4981b1030771598dec72"
         },
         {
           "path": "src/units/1369/5a827be7df-vm_execute_native_exports.hpp",
@@ -78963,7 +79233,7 @@
         },
         {
           "path": "src/units/1530/04e39532e3-vm_script_trace.hpp",
-          "sha256": "cf8b027faaf4cc6d47748545f3bbc511608134b52709f47e6bcc11582b181bb8"
+          "sha256": "ff761238729d9969ddf67814b9ca902f32de1bc9ce93e6fb25213c5166728163"
         },
         {
           "path": "src/units/1530/07079d57d6-trigger_fields.hpp",
@@ -79847,7 +80117,7 @@
         },
         {
           "path": "src/units/1530/b9a47ccdd1-vm_script_trace_native.inc",
-          "sha256": "5700bf039c9ac0af4ca2dbaac7c3dd5b89167fc75f41da13451828238dbbc6f3"
+          "sha256": "9cb6ab4137177cff60800cff799b7f2266ee551c4da21af9a5067dde4abe39bc"
         },
         {
           "path": "src/units/1530/ba24338184-collision_methods.h",
@@ -80531,7 +80801,7 @@
         },
         {
           "path": "src/units/1536/9f18bd8ddf-combat_native.inc",
-          "sha256": "958e437502d85b095f30dacb9286dc6332ae18a65ac0ee5a189178b3276e38c7"
+          "sha256": "93a3ae614ff4170b249745e6f67937aac1257f9a6607323ee9df66ab74853ac5"
         },
         {
           "path": "src/units/1536/a89e7d9860-base_ini.h",
@@ -80595,7 +80865,7 @@
         },
         {
           "path": "src/units/1536/ee59127831-combat_constructor.hpp",
-          "sha256": "f8e8d139394571ce02c2748e69a6982e53b7d40fa0f807187e825e55dc50d4e2"
+          "sha256": "f789b39fc854856da87fbce519fc2418edcc593c4e00c42a1556ee3a5a64dce0"
         },
         {
           "path": "src/units/1537/00a0946121-resources.h",
@@ -88075,7 +88345,7 @@
         },
         {
           "path": "src/derived/0842-server_construct/5d8a5b80e023171a_server_construct.cpp",
-          "sha256": "565c52978e7ea7ee7a195943c9feea49a40dd9314187f882069cd83a59d93d88"
+          "sha256": "10ea41d6e35a33bcdab42cdf2724401f4e32bc21498246696f499a26868205f5"
         },
         {
           "path": "src/derived/0842-server_construct/a5884536589ccff6_server_construct.hpp",
@@ -88123,11 +88393,11 @@
         },
         {
           "path": "src/derived/0849-ai_construct/2fa59ec2bac40639_ai_construct.hpp",
-          "sha256": "68f76936902d9773fb3f90efbac6c11ca406503eabca6fa8e2458813e93ac7c2"
+          "sha256": "261f580b60bcee1a83c70cb01f70faf32b97dd61932fc2a875f2e1dd0eb15c07"
         },
         {
           "path": "src/derived/0849-ai_construct/49f017bf670f82f2_ai_construct.cpp",
-          "sha256": "3b5f3f49e25f0e2830298b8bac2b99b78a3dc468b7d0975e580037ff6e072209"
+          "sha256": "9107ffdf35bd2349bc010a18946c95cf8e89abcf677c23a4d53612305056cfc5"
         },
         {
           "path": "src/derived/0850-ai_dispatch/32dd4813738a3103_ai_dispatch.hpp",
@@ -88163,7 +88433,7 @@
         },
         {
           "path": "src/derived/0855-global_catalog/14fdd219482b44da_global_catalog.hpp",
-          "sha256": "6de867e8861ed8e2aec922456efb32bcee0123c3f38997dc6cccacfa9889f1df"
+          "sha256": "26d7035e9962b07b3f4c10a17ef15d58e3bd74aff6fd4981b1030771598dec72"
         },
         {
           "path": "src/derived/0855-global_catalog/d61dd5093194106c_global_catalog.cpp",
@@ -88171,11 +88441,11 @@
         },
         {
           "path": "src/derived/0856-global_catalog_load/14fdd219482b44da_global_catalog.hpp",
-          "sha256": "6de867e8861ed8e2aec922456efb32bcee0123c3f38997dc6cccacfa9889f1df"
+          "sha256": "26d7035e9962b07b3f4c10a17ef15d58e3bd74aff6fd4981b1030771598dec72"
         },
         {
           "path": "src/derived/0856-global_catalog_load/e75b9f88915b4755_global_catalog_load.cpp",
-          "sha256": "030b96734e648bced458d4969db528da1ae2def2b4c41b247183ff10139dfffe"
+          "sha256": "f6a02089509e9cc967be970520affdae130abfc4921d9a389022568ef862aab0"
         },
         {
           "path": "src/derived/0857-global_catalog_native/08e70ea18f1fcd38_load.h",
@@ -88183,7 +88453,7 @@
         },
         {
           "path": "src/derived/0857-global_catalog_native/14fdd219482b44da_global_catalog.hpp",
-          "sha256": "6de867e8861ed8e2aec922456efb32bcee0123c3f38997dc6cccacfa9889f1df"
+          "sha256": "26d7035e9962b07b3f4c10a17ef15d58e3bd74aff6fd4981b1030771598dec72"
         },
         {
           "path": "src/derived/0857-global_catalog_native/177a467f7ffe42b2_ini_comparison.h",
@@ -88207,7 +88477,7 @@
         },
         {
           "path": "src/derived/0857-global_catalog_native/f503bc26174ec0d2_global_catalog_native.cpp",
-          "sha256": "4e7f8745df1ddd4f712158a20778ca32d01f271c8d66a11e8768badb11f9e804"
+          "sha256": "a5690d7080a9c18847afb94ab83a0c56ce2dc85f58195c6a8875a82b96856d0c"
         },
         {
           "path": "src/derived/0858-save-chargen-save_chargen/9b405f32d36652d9_save_chargen.hpp",
@@ -89327,11 +89597,11 @@
         },
         {
           "path": "src/derived/0964-combat_constructor/22fd9973de33b472_combat_constructor.hpp",
-          "sha256": "f8e8d139394571ce02c2748e69a6982e53b7d40fa0f807187e825e55dc50d4e2"
+          "sha256": "f789b39fc854856da87fbce519fc2418edcc593c4e00c42a1556ee3a5a64dce0"
         },
         {
           "path": "src/derived/0964-combat_constructor/356b852d99edefa8_combat_constructor.cpp",
-          "sha256": "64f4a7c5ea0695f65acdb299673edc3d7d500f1e57efea30173eecdc3fc5df15"
+          "sha256": "990109d9e264d1b0d3882f10ed2b9927210dd1e7dee1b1e61e727c9b2d73069c"
         },
         {
           "path": "src/derived/0965-ai_registration/8f4443275e618b09_ai_registration.hpp",
@@ -89815,11 +90085,11 @@
         },
         {
           "path": "src/derived/1010-module_tag/84538cef4b2b90b9_module_tag.cpp",
-          "sha256": "fd9e1963fb4af0146fbb0a8e369fab2614f8ac4cf81c31015193684252824a3d"
+          "sha256": "823eb99bc3ca314ea4d489880bff4a220ce0159128e4a22ea962aa69db58587d"
         },
         {
           "path": "src/derived/1010-module_tag/c109ae92e469d9e9_module_tag.hpp",
-          "sha256": "7df5c3d49a0a8561d473148171be3d8287c712612b6fe378f37b898ad8a8c365"
+          "sha256": "6bbd742fc4577a978ecd3a94752f71ff7ce5aa77d3a6dff789c34821bba5311c"
         },
         {
           "path": "src/derived/1011-module_tag_native_remove/61584bab4587649a_module_tag_remove.hpp",
@@ -89827,11 +90097,11 @@
         },
         {
           "path": "src/derived/1011-module_tag_native_remove/8abbadb2a374d6d7_module_tag_native_remove.cpp",
-          "sha256": "0ebb9c4e35978b12e98f045e76c3fb2e4ed1644b0e1635a6664761dded0058df"
+          "sha256": "31bd06d37a74b4566718b6a229bd91f8c887483e5ab686a8c06990fcd9b44eb8"
         },
         {
           "path": "src/derived/1011-module_tag_native_remove/c109ae92e469d9e9_module_tag.hpp",
-          "sha256": "7df5c3d49a0a8561d473148171be3d8287c712612b6fe378f37b898ad8a8c365"
+          "sha256": "6bbd742fc4577a978ecd3a94752f71ff7ce5aa77d3a6dff789c34821bba5311c"
         },
         {
           "path": "src/derived/1012-item_owner/22521de4edda2e7f_item_owner.hpp",
@@ -91295,7 +91565,7 @@
         },
         {
           "path": "src/derived/1164-module_tag_remove/c109ae92e469d9e9_module_tag.hpp",
-          "sha256": "7df5c3d49a0a8561d473148171be3d8287c712612b6fe378f37b898ad8a8c365"
+          "sha256": "6bbd742fc4577a978ecd3a94752f71ff7ce5aa77d3a6dff789c34821bba5311c"
         },
         {
           "path": "src/derived/1165-placeable_placement/4f727ab50b1551ae_server_mainloop.hpp",
@@ -91679,11 +91949,11 @@
         },
         {
           "path": "src/derived/1192-vm_script_trace/8c5a390f6f3039f4_vm_script_trace.hpp",
-          "sha256": "cf8b027faaf4cc6d47748545f3bbc511608134b52709f47e6bcc11582b181bb8"
+          "sha256": "ff761238729d9969ddf67814b9ca902f32de1bc9ce93e6fb25213c5166728163"
         },
         {
           "path": "src/derived/1192-vm_script_trace/e7044426b332ac71_vm_script_trace.cpp",
-          "sha256": "87a8edbbf6582a972d6fda502cf3ab0ffb5135e05500d8a2b4877d67018b4b05"
+          "sha256": "be58d64ff01f488df9381ba66de99d9e204e3b0d896a8d9e46bdf2a869314555"
         },
         {
           "path": "src/derived/1193-event_strings/03ef755c5f1a1e53_event_strings.hpp",
@@ -93399,31 +93669,91 @@
         },
         {
           "path": "src/bridge/a_sws_creature_broadcast.cpp",
-          "sha256": "0fadc2f59a93be36256a920bbe06d6018cfdcc6112f37006f0883ccc1726ac6b"
+          "sha256": "0d0683112bf4c438d3f2510e50cf8ab481429a8ed2dc2f8c9ef545bcd9d0cb6d"
         },
         {
           "path": "src/bridge/c_client_exo_app.cpp",
-          "sha256": "302b5a14fc65198a2e45d48c245dfb960f2d25d191b6e4a068276af58952e5b5"
+          "sha256": "d6839aa9aa83484c04656210abddb49a28662b3ac3755837b3a45e86316a8487"
         },
         {
           "path": "src/bridge/d_res_ref.cpp",
-          "sha256": "173b491b83b54d365e77469d9fe2010b6116e503643593bfb6337334b109099e"
+          "sha256": "6d05972f2ebe85326c793e4ca82c96eaa13a8c50b18d30907c3d8437aec92ac8"
         },
         {
           "path": "src/bridge/f_inventory.cpp",
-          "sha256": "32cbaefdb5dc6c1d50d1d3d569d24613290300171bdcb8f2d2772d51b11a4db0"
+          "sha256": "ce68679622f5a00f277e0b1f973d3e24174d99aaa7abf467a6ac22113f649ec7"
         },
         {
           "path": "src/bridge/f_surfmesh.cpp",
-          "sha256": "b0e31957b351346b064da8cb33a94807f3a9fba11d47a3cafacd4c5f938059f6"
+          "sha256": "c51cc6c3d0a030321992d375afc6e8d654a0468d825ca05dd2ddea774f6594ba"
         },
         {
           "path": "src/bridge/j_exo_input.cpp",
-          "sha256": "342d6a9e350ad2861c913fe3b48b20792aba6c22b601fcf14a571289ded1ed64"
+          "sha256": "a58f4115c0472e573f20b64f1f5f8234a062f9025ae1b5c67947f74cefd79728"
         },
         {
           "path": "src/bridge/i_server_exo_app_internal.cpp",
-          "sha256": "878bccf53616878640dad32def1ab0b23c5a97de28a0d82a23dcc6d8e4c21553"
+          "sha256": "3c11554afaa5c123a0585f8a13396b15e580d21d9229549550b7426c1a9db316"
+        },
+        {
+          "path": "src/bridge/b_sws_item.cpp",
+          "sha256": "cf0eb5be63edbc1b680ba7b8b6c26a7108fcd29124c74dc65ced35941720c5cf"
+        },
+        {
+          "path": "src/bridge/b_sws_item3.cpp",
+          "sha256": "64784421e0803e1a74511fcbebfac0a5c69030ed2ac5d9e5bdf2a2d150081e83"
+        },
+        {
+          "path": "src/bridge/i_server_ai_master.cpp",
+          "sha256": "85b24e58901dc12bcb0d5b24d3ca5f596f8881052ba76567c1c7c1b70f0c0d58"
+        },
+        {
+          "path": "src/bridge/i_server_exo_app.cpp",
+          "sha256": "c1383f8f7a3264937fd746c658ad58a1b52d8db1cb91e8bf23350f7d7b280537"
+        },
+        {
+          "path": "src/bridge/c_exo_facade_r7.cpp",
+          "sha256": "1d42f08c5b12e30b1e324a5eb18f00b1133aaf61e8d1a6645f57db41969e2ec5"
+        },
+        {
+          "path": "src/bridge/c_exo_loc_string_internal.cpp",
+          "sha256": "2c532bfcd262e5f9cfd425d33722242ab36d810330d3eb386c9bb9282fe3374d"
+        },
+        {
+          "path": "src/bridge/c_client_exo_app_internal.cpp",
+          "sha256": "00905c2ea21820edfefca70b4060fcf9067395d53f0f30c550c4ca467075bcec"
+        },
+        {
+          "path": "src/bridge/c_client_exo_app_internal_r5.cpp",
+          "sha256": "ebb5da7cf52e78113e9de56108355da9396dd64dc301091041bde63c69081871"
+        },
+        {
+          "path": "src/bridge/j_exo_sound_list.cpp",
+          "sha256": "cafa687d3c72edb9b6048b5cd6c1268fd9e22543657c2155ab286f2129890dc6"
+        },
+        {
+          "path": "src/bridge/f_stats_getters.cpp",
+          "sha256": "510caaa82f784f2be4cff932c15387e52167aac7614e0b641bc6e74726fd76b0"
+        },
+        {
+          "path": "src/bridge/b_global_variable_table.cpp",
+          "sha256": "e377107e542b56e8d6427ff2ab99f3c4d57be28687a39cd2b9d2fe3a39d564df"
+        },
+        {
+          "path": "src/bridge/a_sws_combat_round.cpp",
+          "sha256": "16b86529c67195511951cefb659f2abe0a3153f68682b6e7967d6a6364f6eaff"
+        },
+        {
+          "path": "src/bridge/i_sws_module.cpp",
+          "sha256": "443247237bd168aefb488dc3a4c500e0da70afbd45412df1c750d31466e9dde5"
+        },
+        {
+          "path": "src/bridge/f_door_trigger.cpp",
+          "sha256": "c19f13ba2ef0d537d3d2b08ee6771264fa94e5c19eb04ea73526fcd0a551a3e0"
+        },
+        {
+          "path": "src/bridge/b_server_misc.cpp",
+          "sha256": "d495965ddb541b3952850cee447822b943108134485edec7a2f0f4f56f814215"
         }
       ],
       "generation": {

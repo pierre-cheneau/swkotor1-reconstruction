@@ -105,3 +105,8 @@ StartupString* __fastcall GuiConcat005e5d10(StartupString* self,void*,StartupStr
     return output;
 
 }
+// CExoString::operator+ for bridged code (src/bridge): the result is built at the caller's hidden pointer.
+extern "C" void* __fastcall kotor_fastcall_005e5d10(void* self,void*,void* output,const void* right) {
+    return GuiConcat005e5d10(static_cast<StartupString*>(self),nullptr,static_cast<StartupString*>(output),
+                             static_cast<const StartupString*>(right));
+}

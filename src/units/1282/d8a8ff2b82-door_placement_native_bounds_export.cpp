@@ -13,6 +13,8 @@ void* __fastcall recovered_object_area_004cb120(void*,void*);
 void __fastcall recovered_object_position_004cd1a0(void*,void*,void*,unsigned,unsigned,unsigned);
 unsigned __fastcall recovered_area_insert_0050dfd0(void*,void*,unsigned,unsigned);
 __declspec(noreturn)void __cdecl kotor_unreachable_trap(unsigned long,const char*);
+// CSWSDoor::GetMeshOutline: byte-identical matched code (src/bridge); its two Vectors pass by value, 12 bytes each.
+int __fastcall kotor_fastcall_00588940(void*,void*,recovered_door_placement::Vector,recovered_door_placement::Vector,void*,void*,void*,void*);
 }
 // stale-stubs G3: ports rebound (0050DC40 claude_combat_spell_mine, 0066DCC0 W1 b7, 0058FEC0 claude_w1_route_bodies).
 extern "C"{unsigned __fastcall kotor_fastcall_0050dc40(void*,void*,unsigned);unsigned __fastcall recovered_int_list_remove_0066dcc0(void*,void*,unsigned);unsigned __fastcall kotor_fastcall_0058fec0(void*,void*,unsigned);}
@@ -29,7 +31,7 @@ struct Native:recovered_door_placement::Ports,recovered_creature_area_access::Po
  U bounds(U a,recovered_door_placement::Vector v,recovered_door_placement::Vector d,U lo,U hi)override{return recovered_door_bounds_00589980(ptr(a),nullptr,v.x,v.y,v.z,d.x,d.y,d.z,ptr(lo),ptr(hi));}
  void add_bounds(U a,U id,U lo,U hi)override{(void)recovered_door_area_bounds::append(a,id,lo,hi,*this);}
  U geometry(U a,U b,U c,U d,U e)override{return recovered_mesh_four_corners_00596e40(ptr(a),nullptr,ptr(b),ptr(c),ptr(d),ptr(e));}
- void geometry(U a,recovered_door_placement::Vector v,recovered_door_placement::Vector,U b,U c,U d,U e)override{(void)recovered_door_geometry::calculate(a,v.x,v.y,v.z,b,c,d,e,*this);}
+ void geometry(U a,recovered_door_placement::Vector v,recovered_door_placement::Vector o,U b,U c,U d,U e)override{(void)kotor_fastcall_00588940(ptr(a),nullptr,v,o,ptr(b),ptr(c),ptr(d),ptr(e));}
 };}
 extern "C" void __fastcall recovered_door_placement_0058b6d0(void*self,void*,unsigned area,unsigned x,unsigned y,unsigned z,unsigned flag){Native p;unsigned scratch[3];recovered_door_placement::place(word(self),area,x,y,z,flag,word(scratch),p);}
 

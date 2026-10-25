@@ -11,6 +11,8 @@ template <class T> using storage = std::remove_cv_t<std::remove_reference_t<T>>;
 }  // namespace kotor_bridge
 namespace kotor_menu_window_cells { extern void* volatile manager_007a39fc; }
 namespace kotor_bridge_a_sws_creature_broadcast {
+#pragma warning(push)
+#pragma warning(disable: 4100 4244)
 // CSWSCreature party broadcasts and small leaves (0x004EAD70-0x004ECE73;
 // behavioural reference: src/batches/b004e5_enhancement_creature_ai.cpp).
 // ---- matching/include/a/sws_creature_broadcast.h
@@ -260,6 +262,7 @@ void CSWSCreature::SetFlag288Bit3(int bValue)
 {
     m_b288_3 = bValue;
 }
+#pragma warning(pop)
 
 extern "C" void __fastcall kotor_fastcall_004ead70(void* self, void*, int a0)
 {

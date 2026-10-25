@@ -30,17 +30,19 @@ def quiet_emulated_faults():
         faulthandler.enable(file=sys.__stderr__)
 
 
-def image(tmp_path: Path, code: bytes, name: str) -> gate.Image:
-    """A synthetic executable whose .text starts with code, padded so 0x00401000..0x00402000 is mapped."""
+def image(tmp_path: Path, code: bytes, name: str, rdata: bytes = b"") -> gate.Image:
+    """A synthetic executable whose .text starts with code, padded so 0x00401000..0x00403000 is mapped; rdata, if
+    any, is its .rdata at 0x00403000."""
     path = tmp_path / f"{name}.exe"
-    synthetic_pe.write_code_image(path, code + bytes(0x2000 - len(code)))
+    synthetic_pe.write_code_image(path, code + bytes(0x2000 - len(code)), rdata)
     return gate.Image.load(path.read_bytes())
 
 
-def check(tmp_path: Path, original: bytes, rebuilt: bytes, **target) -> gate.Report:
+def check(tmp_path: Path, original: bytes, rebuilt: bytes, rdata: tuple[bytes, bytes] = (b"", b""),
+          **target) -> gate.Report:
     fields = {"name": "f", "original": TEXT, "rebuilt": TEXT, "params": (), "popped": 0, "mask": 0xFFFFFFFF, **target}
-    return gate.check(gate.Target(**fields), image(tmp_path, original, "original"),
-                      image(tmp_path, rebuilt, "rebuilt"), TRIALS)
+    return gate.check(gate.Target(**fields), image(tmp_path, original, "original", rdata[0]),
+                      image(tmp_path, rebuilt, "rebuilt", rdata[1]), TRIALS)
 
 
 GETTER = bytes.fromhex("8b4104 8b4050 c3")                 # return this->m_p4->m_x50
@@ -132,10 +134,10 @@ def symbols(tmp_path: Path) -> dict[str, int]:
 
 
 def test_entries_resolve_with_their_stack_bytes(symbols) -> None:
-    assert gate.entry(symbols, 0x004B1740) == (0x008AD2E0, 4)
-    assert gate.entry(symbols, 0x005A4930) == (0x008AD200, 0)
+    assert gate.entry(symbols, "kotor_fastcall_004b1740") == (0x008AD2E0, 4)
+    assert gate.entry(symbols, "kotor_fastcall_005a4930") == (0x008AD200, 0)
     with pytest.raises(ValueError, match=r"0 link\.map symbols"):
-        gate.entry(symbols, 0x00401000)
+        gate.entry(symbols, "kotor_fastcall_00401000")
 
 
 def test_bound_storage_resolves_by_its_msvc_name(symbols, tmp_path: Path) -> None:
@@ -147,14 +149,95 @@ def test_bound_storage_resolves_by_its_msvc_name(symbols, tmp_path: Path) -> Non
     assert gate.storage_symbol(symbols, data.storage(0x0074A824)) == 0x0095D888
 
 
-@pytest.mark.parametrize(("type_", "mask"), [
-    ("void", None), ("unsigned char", 0xFF), ("short", 0xFFFF), ("int", 0xFFFFFFFF), ("CSWSItem*", 0xFFFFFFFF),
-    ("unsigned long*", 0xFFFFFFFF),
+def member(demangled: str) -> bridge_sources.Function:
+    return bridge_sources.Function.parse(0x00401000, demangled)
+
+
+@pytest.mark.parametrize(("demangled", "mask"), [
+    ("public: void __thiscall A::F(void)", None),
+    ("public: unsigned char __thiscall A::F(void)", 0xFF),
+    ("public: short __thiscall A::F(void)", 0xFFFF),
+    ("public: int __thiscall A::F(void)", 0xFFFFFFFF),
+    ("public: class CSWSItem * __thiscall A::F(void)", 0xFFFFFFFF),
+    ("public: __thiscall A::A(void)", 0xFFFFFFFF),
+    ("public: class CExoString __thiscall A::F(void)", 0xFFFFFFFF),      # the hidden pointer comes back
 ])
-def test_return_masks(type_, mask) -> None:
-    assert gate.return_mask(type_) == mask
+def test_return_masks(demangled: str, mask: int | None) -> None:
+    assert gate.return_mask(member(demangled)) == mask
 
 
 def test_float_returns_are_refused() -> None:
     with pytest.raises(ValueError, match="not compared"):
-        gate.return_mask("double")
+        gate.return_mask(member("public: double __thiscall A::F(void)"))
+
+
+def test_stack_words_place_hidden_pointers_and_classes_by_value() -> None:
+    assert gate.stack_words(member("public: class CExoString __thiscall A::F(int)"), 8) == ("void*", "int")
+    mesh = member("public: int __thiscall A::F(struct Vector,struct Vector,int *)")
+    assert gate.stack_words(mesh, 28) == ("word",) * 6 + ("int*",)
+    assert gate.stack_words(member("public: void __thiscall A::F(double,char)"), 12) == ("double",) * 2 + ("char",)
+    with pytest.raises(ValueError, match="cannot place"):
+        gate.stack_words(mesh, 26)
+
+
+def test_the_original_cleanup_is_read_through_thunks(tmp_path: Path) -> None:
+    code = bytes.fromhex("33c0 c20800") + bytes(0x100 - 5)              # 00401000: xor eax,eax; ret 8
+    code += bytes.fromhex("8b4904 e9f6feffff") + bytes(0x100 - 8)       # 00401100: thunk to 00401000
+    code += bytes.fromhex("8b01 ff6008") + bytes(0x100 - 5)             # 00401200: jmp [eax+8]
+    code += bytes.fromhex("c3")                                         # 00401300: ret
+    original = image(tmp_path, code, "original")
+    assert [gate.cleanup(original, a) for a in (0x00401000, 0x00401100, 0x00401200, 0x00401300)] == [8, 8, None, 0]
+
+
+ALLOCATE = bytes.fromhex("6a18 e8f9000000 59 c3")             # operator new(0x18) at 00401100; return it
+ALLOCATE_REBUILT = bytes.fromhex("31c9 6a18 e8f7010000 59 c3")   # ... at 00401200, with ECX cleared first
+ALLOCATE_LESS = bytes.fromhex("6a14 e8f9000000 59 c3")
+HEAP = (gate.Callee(0x00401100, 0x00401200, 0, 1),)
+
+
+def test_heap_calls_compare_their_first_argument_only(tmp_path: Path) -> None:
+    assert check(tmp_path, ALLOCATE, ALLOCATE_REBUILT, callees=HEAP).passed
+    assert not check(tmp_path, ALLOCATE, ALLOCATE_LESS, callees=HEAP).passed
+
+
+def test_a_defect_found_before_running_fails(tmp_path: Path) -> None:
+    report = check(tmp_path, GETTER, GETTER, defect="forward x pops 4 bytes, the original 00401000 8")
+    assert not report.passed and report.difference.startswith("forward x")
+
+
+EXCEPTION_LIST = bytes.fromhex("64a100000000 c3")            # return fs:[0], the head of the SEH chain
+
+
+def test_functions_with_exception_frames_run_on_a_thread_block(tmp_path: Path) -> None:
+    report = check(tmp_path, EXCEPTION_LIST, EXCEPTION_LIST)
+    assert report.passed and report.completed == TRIALS
+
+
+SPIN = bytes.fromhex("ebfe")                                  # jmp $
+
+
+def test_a_run_out_of_steps_is_not_compared(tmp_path: Path) -> None:
+    report = check(tmp_path, GETTER, SPIN)
+    assert (report.passed, report.difference, report.exhausted) == (False, None, TRIALS)
+
+
+# Each passes the address of a local to the callee at 00401100 (which pops it), from different frame offsets.
+LOCAL_AT_0 = bytes.fromhex("83ec08 8d0424 50 e8f4000000 83c408 c3")
+LOCAL_AT_4 = bytes.fromhex("83ec08 8d442404 50 e8f3000000 83c408 c3")
+THIS_INSTEAD = bytes.fromhex("83ec08 51 e8f6000000 83c408 c3")
+CALLEE = (gate.Callee(0x00401100, 0x00401100, 4),)
+
+
+def test_stack_temporaries_compare_by_slot_not_by_frame_offset(tmp_path: Path) -> None:
+    assert check(tmp_path, LOCAL_AT_0, LOCAL_AT_4, callees=CALLEE).passed
+    assert not check(tmp_path, LOCAL_AT_0, THIS_INSTEAD, callees=CALLEE).passed
+
+
+PUSH_LITERAL_0 = bytes.fromhex("6800304000 e8f6000000 c3")    # callee(",") with "," at 00403000
+PUSH_LITERAL_16 = bytes.fromhex("6810304000 e8f6000000 c3")   # ... with "," at 00403010
+
+
+def test_literals_compare_by_their_text(tmp_path: Path) -> None:
+    padded = b"padding padding!"
+    assert check(tmp_path, PUSH_LITERAL_0, PUSH_LITERAL_16, (b",\0", padded + b",\0"), callees=CALLEE).passed
+    assert not check(tmp_path, PUSH_LITERAL_0, PUSH_LITERAL_16, (b",\0", padded + b".\0"), callees=CALLEE).passed
