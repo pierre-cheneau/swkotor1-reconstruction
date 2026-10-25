@@ -49,7 +49,7 @@ def import_libraries(game: Path, output: Path, librarian: Path) -> list[dict[str
         def_file, library = output / f"{stem}.def", output / f"{stem}.lib"
         write_text(def_file, definition(filename, dll), "\r\n")
         command = [str(librarian), "/nologo", f"/def:{def_file}", "/machine:x86", f"/out:{library}"]
-        run = subprocess.run(command, cwd=output, capture_output=True, text=True, timeout=120)
+        run = subprocess.run(command, cwd=output, capture_output=True, text=True, timeout=120, check=False)
         (output / f"{stem}.log").write_text(run.stdout + run.stderr, encoding="utf-8")
         if run.returncode or not library.is_file() or library.stat().st_size == 0:
             raise RuntimeError(f"Import library generation failed for {filename}")

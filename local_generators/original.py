@@ -50,7 +50,8 @@ class OriginalImage:
         if self.sha256 != EXE_SHA256:
             raise ValueError("The original executable does not match the supported GOG release")
         header = struct.unpack_from("<I", self.data, 0x3C)[0]
-        count, optional = struct.unpack_from("<H", self.data, header + 6)[0], struct.unpack_from("<H", self.data, header + 20)[0]
+        (count,) = struct.unpack_from("<H", self.data, header + 6)
+        (optional,) = struct.unpack_from("<H", self.data, header + 20)
         self.image_base = struct.unpack_from("<I", self.data, header + 52)[0]
         table = header + 24 + optional
         self.sections = []

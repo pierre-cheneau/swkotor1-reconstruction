@@ -136,7 +136,7 @@ def windows_functions(win):
     found = {a for a in named | matchcmp.call_targets(win.pe) if win.text_start <= a < text_end}
     starts = sorted(listed | found)
     game = set(starts) - crt - eh
-    ends = {a: b for a, b in zip(starts, starts[1:] + [text_end])}
+    ends = {a: b for a, b in zip(starts, [*starts[1:], text_end])}
     return game, set(starts), ends, crt, found - listed
 
 
@@ -317,7 +317,7 @@ def split_params(params):
         depth += c in "(<"
         depth -= c in ")>"
         current += c
-    return out + [current] if current or out else out
+    return [*out, current] if current or out else out
 
 
 # The differences a name pair may have between the repo's parameter types
@@ -410,9 +410,9 @@ def windows_names():
         if not name:
             continue
         if address in symbols:
-            if name.startswith("?") and name not in symbols[address]:
-                seen[address].add((name, None))
-            elif not name.startswith("?") and name not in {q for q, _ in seen[address]}:
+            decorated = name.startswith("?")
+            if (decorated and name not in symbols[address]) or (
+                    not decorated and name not in {q for q, _ in seen[address]}):
                 seen[address].add((name, None))
             continue
         parts = name.split("::")
@@ -524,7 +524,7 @@ class MachO:
         return struct.unpack(">I", raw)[0] if len(raw) == 4 else None
 
     def name(self, strx):
-        symoff, nsyms, stroff, strsize = self.symtab
+        _symoff, _nsyms, stroff, strsize = self.symtab
         self.need(strx < strsize, f"symbol name index {strx} outside the string table")
         end = self.data.find(b"\0", stroff + strx, stroff + strsize)
         self.need(end >= 0, f"symbol name at string index {strx} is not NUL-terminated")
@@ -532,7 +532,7 @@ class MachO:
 
     def symbols(self):
         """[(address, section number, name)] of defined, non-debug symbols."""
-        symoff, nsyms, stroff, _ = self.symtab
+        symoff, nsyms, _stroff, _ = self.symtab
         out = []
         for i in range(nsyms):
             strx, ntype, sect, _, value = struct.unpack_from(">IBBhI", self.data, symoff + 12 * i)
@@ -546,7 +546,7 @@ class MachO:
         the object, its N_FUN entries follow, and an N_SO opens or closes a
         compile unit, so an N_FUN after it belongs to no object until the next
         N_OSO. {} for a build without a debug map."""
-        symoff, nsyms, stroff, _ = self.symtab
+        symoff, nsyms, _stroff, _ = self.symtab
         found, current = {}, None
         for i in range(nsyms):
             strx, ntype, _, _, value = struct.unpack_from(">IBBhI", self.data, symoff + 12 * i)
@@ -584,7 +584,7 @@ def ppc_functions(mac, tool):
     demangled = demangle([n for _, n in starts], tool)
     names = {a: (n, d) for (a, n), d in zip(starts, demangled)}
     addresses = [a for a, _ in starts]
-    ends = dict(zip(addresses, addresses[1:] + [text[2] + text[3]]))
+    ends = dict(zip(addresses, [*addresses[1:], text[2] + text[3]]))
     tables = [(a, n) for a, _, n in syms if n.startswith("__ZTV")]
     vtables = {d.replace("vtable for ", ""): a
                for (a, _), d in zip(tables, demangle([n for _, n in tables], tool))}
@@ -641,10 +641,7 @@ def ppc_step(w, pc, regs, lr, ref):
             lr = None
     elif w == 0x429F0005:  # bcl 20,31,$+4
         lr = pc + 4
-    elif op == 16 and w & 1:  # other linked bc
-        called()
-        lr = None
-    elif op == 19 and xo in (16, 528) and w & 1:  # bclrl / bcctrl (blrl, bctrl)
+    elif (op == 16 and w & 1) or (op == 19 and xo in (16, 528) and w & 1):  # other linked bc
         called()
         lr = None
     elif op == 31 and xo == 339 and ((w >> 11) & 0x3FF) == 0x100:  # mflr
@@ -1017,7 +1014,7 @@ def scan_ppc(mac, ends, strings):
         before, _ = ppc_analyse(words, fn, mac.word)
         calls, texts = [], set()
 
-        def ref(value):
+        def ref(value, texts=texts):
             if value in strings:
                 texts.add(strings[value])
 
@@ -1189,10 +1186,10 @@ def pair_calls(pairs, wscan, pscan, wgame, wsize, psize, min_votes):
     while changed:
         anchors = defaultdict(set)  # proposal: the paired functions that make it
         for w, p in pairs.p.items():
-            for wl, pl in ((wscan.get(w, ([],))[0], pscan.get(p, ([],))[0]),
-                           (wcallers.get(w, []), pcallers.get(p, []))):
-                wl = [x for x in wl if x in wgame and x not in pairs.p]
-                pl = [x for x in pl if x not in pairs.w]
+            for wnear, pnear in ((wscan.get(w, ([],))[0], pscan.get(p, ([],))[0]),
+                                 (wcallers.get(w, []), pcallers.get(p, []))):
+                wl = [x for x in wnear if x in wgame and x not in pairs.p]
+                pl = [x for x in pnear if x not in pairs.w]
                 if len(wl) == 1 and len(pl) == 1 and plausible(wl[0], pl[0]):
                     anchors[(wl[0], pl[0])].add(w)
         wseen = Counter(w for w, _ in anchors)
@@ -1483,11 +1480,15 @@ def main():
               f"{s['vtables paired']} vtables paired, {s['vtables contradicted']} contradicted; "
               f"{len(pairs.p)} Windows functions paired "
               + "(" + ", ".join(f"{m} {sum(1 for v in pairs.method.values() if v == m)}" for m in METHODS) + "); "
-              + "name pairs by parameters: " + ", ".join(f"{k} {n}" for k, n in sorted(Counter(pairs.signature[x] for x, m in pairs.method.items() if m == "name").items()))
+              + "name pairs by parameters: "
+              + ", ".join(f"{k} {n}" for k, n in sorted(Counter(
+                  pairs.signature[x] for x, m in pairs.method.items() if m == "name").items()))
               + f"; refused for parameters {len(refused)}")
     print()
     print(f"{'':42} {'functions':>9}")
-    new = lambda x: x in combined and combined[x][0] and x not in w.names
+    def new(x):
+        return x in combined and combined[x][0] and x not in w.names
+
     for label, pred in (
             ("byte-identical (MATCH)", lambda x: status.get(x) == "MATCH"),
             ("attempted (NONMATCH)", lambda x: status.get(x) == "NONMATCH"),
@@ -1498,7 +1499,8 @@ def main():
             ("  paired by several builds, same name", lambda x: x in combined and combined[x][2][0] not in "1c"),
             ("  builds disagree (left unnamed)", lambda x: combined.get(x, ("",) * 3)[2] == "conflict"),
             ("new names (unnamed in the repo)", new),
-            (f"  confirmed by all {len(builds)} builds", lambda x: new(x) and combined[x][2] == f"{len(builds)}/{len(builds)}"),
+            (f"  confirmed by all {len(builds)} builds",
+             lambda x: new(x) and combined[x][2] == f"{len(builds)}/{len(builds)}"),
             ("still unnamed", lambda x: x not in w.names and not (x in combined and combined[x][0])),
             ("with an original source file (paired)", lambda x: x in sources),
             ("  placed inside a source-file run", lambda x: x in inferred),

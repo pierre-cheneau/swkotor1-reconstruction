@@ -182,8 +182,12 @@ def render(functions, units: int, complete: bool, old_status: dict[int, str] | N
     total = len(game)
     game_bytes = sum(f[1] for f in game) or 1
     eh = len(functions) - total
-    count = lambda pred: sum(1 for f in game if pred(f))
-    size = lambda pred: sum(f[1] for f in game if pred(f))
+    def count(pred) -> int:
+        return sum(1 for f in game if pred(f))
+
+    def size(pred) -> int:
+        return sum(f[1] for f in game if pred(f))
+
     defined = count(lambda f: f[3] == 2)
     folded = count(lambda f: f[3] == 1)
     runtime = count(lambda f: f[3] == 3)
@@ -307,7 +311,9 @@ def render(functions, units: int, complete: bool, old_status: dict[int, str] | N
             f"({matched / total * 100:.1f}%) compile to the original bytes, plus {library:,} "
             f"identical to the stock LIBCMT.LIB.")
     body = "\n    ".join(parts)
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="960" height="{height}" viewBox="0 0 960 {height}" role="img" aria-labelledby="card-title card-desc">
+    svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="960" height="{height}" viewBox="0 0 960 {height}" '
+           'role="img" aria-labelledby="card-title card-desc">')
+    return f'''{svg}
   <title id="card-title">KOTOR decompilation progress</title>
   <desc id="card-desc">{escape(desc)}</desc>
   <rect x="1" y="1" width="958" height="{height - 2}" rx="14" fill="{BG}" stroke="{BORDER}" stroke-width="1.5"/>

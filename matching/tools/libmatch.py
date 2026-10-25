@@ -12,6 +12,7 @@ placement (LIBCMT, LIBCPMT, LIBCIMT). Functions under 6 bytes are skipped.
 import csv
 import sys
 from collections import defaultdict
+from pathlib import Path
 
 import pefile
 
@@ -69,7 +70,7 @@ def main():
     text = next(s for s in pe.sections if s.Name.rstrip(b"\0") == b".text")
     base = pe.OPTIONAL_HEADER.ImageBase + text.VirtualAddress
     image = text.get_data()
-    data = open(lib, "rb").read()
+    data = Path(lib).read_bytes()
     rows, total, objs = [], 0, 0
     for member, body in ar_members(data):
         objs += 1

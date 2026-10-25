@@ -105,7 +105,7 @@ def setup_msvc(vs_root: Path) -> dict[str, str]:
 
 
 def run(argv: list[str], env: dict[str, str], log: Path) -> None:
-    result = subprocess.run(argv, cwd=ROOT, env=env, capture_output=True, text=True, timeout=300)
+    result = subprocess.run(argv, cwd=ROOT, env=env, capture_output=True, text=True, timeout=300, check=False)
     log.write_text(result.stdout + result.stderr, encoding="utf-8")
     if result.returncode:
         raise RuntimeError(f"Command failed ({result.returncode}); see {log}")
@@ -358,8 +358,11 @@ def main() -> None:
     parser.add_argument("--target", choices=["game"], default="game")
     parser.add_argument("--game-dir", type=Path)
     parser.add_argument("--out", type=Path, help="New directory for this build")
-    parser.add_argument("--prepare-runtime", type=Path, help="Create required empty directories in an existing runtime copy; do not build or launch")
-    parser.add_argument("--vs-root", type=Path, default=Path(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")) / "Microsoft Visual Studio/2022/BuildTools")
+    parser.add_argument("--prepare-runtime", type=Path,
+                        help="Create required empty directories in an existing runtime copy; do not build or launch")
+    program_files = os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")  # noqa: SIM112 - Windows' own name
+    parser.add_argument("--vs-root", type=Path,
+                        default=Path(program_files) / "Microsoft Visual Studio/2022/BuildTools")
     parser.add_argument("--clang-cl", type=Path)
     parser.add_argument("--jobs", type=int, default=1, help="Concurrent compiler processes (1–16)")
     args = parser.parse_args()

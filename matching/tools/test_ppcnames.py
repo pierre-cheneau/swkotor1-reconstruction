@@ -14,7 +14,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import ppcnames as pn  # noqa: E402
+import ppcnames as pn
 
 
 def mac_index(*entries):
@@ -67,7 +67,8 @@ class Signatures(unittest.TestCase):
         self.assertEqual(pn.split_name("public: class CResRef & __thiscall CResRef::operator=(class CResRef const &)"),
                          pn.split_name("CResRef::operator=(CResRef const&)"))
         self.assertEqual(pn.split_name("Foo::operator()(int) const"), ("Foo::operator()", "int|const"))
-        self.assertEqual(pn.split_name("Box<unsigned int>::operator bool() const")[0], "Box<unsigned int>::operator bool")
+        self.assertEqual(pn.split_name("Box<unsigned int>::operator bool() const")[0],
+                         "Box<unsigned int>::operator bool")
         self.assertEqual(pn.split_name("bool Box<unsigned int>::operator==(Box<unsigned int> const&)")[0],
                          "Box<unsigned int>::operator==")
         self.assertNotEqual(pn.split_name("Box<unsigned int>::operator bool()"),
@@ -245,7 +246,8 @@ def memory(code, table=b"", table_at=0x8000):
             if start <= a < start + len(data):
                 return data[a - start:a - start + n]
         return b""
-    word = lambda a: struct.unpack(">I", bytes_at(a, 4))[0] if len(bytes_at(a, 4)) == 4 else None
+    def word(a):
+        return struct.unpack(">I", bytes_at(a, 4))[0] if len(bytes_at(a, 4)) == 4 else None
     return SimpleNamespace(bytes_at=bytes_at, word=word)
 
 
@@ -316,7 +318,7 @@ class PPCScanner(unittest.TestCase):
         body = [lis(31, 1), cmplwi(3, count - 1)] + guards[guard] + list(after_guard)
         body += [lis(9, 1), addi(9, 9, -0x8000), slwi(0, 3, 2), lwzx(0, 9, 0)]
         body += [add(0, 0, 9)] if relative else []
-        body += list(between) + [MTCTR0, BCTR]
+        body += [*list(between), MTCTR0, BCTR]
         bctr = len(body) - 1
         case1, out, case2 = bctr + 1, bctr + 3, bctr + 6
         body += [addi(4, 31, 0x20), BLR, lis(31, 3), addi(7, 31, 0x50), BLR, lis(31, 2), addi(6, 31, 0x40), BLR]
@@ -422,7 +424,7 @@ class PPCScanner(unittest.TestCase):
     def test_jump_table_reads_only_the_checked_entries(self):
         # one case checked; the next word looks like a case but is not one
         code, table, bctr, cases = self.switch(False, count=1)
-        words, (before, succ) = self.analyse(code, table)
+        _words, (_before, succ) = self.analyse(code, table)
         self.assertEqual(succ[bctr], [cases[0]])
 
     def test_jump_table_beyond_max_cases_is_not_proven(self):
@@ -433,7 +435,7 @@ class PPCScanner(unittest.TestCase):
 
     def test_jump_table_target_overwritten_is_not_proven(self):
         code, table, bctr, _ = self.switch(False, between=[addi(0, 0, 0x1020)])  # li r0,0x1020
-        words, (before, succ) = self.analyse(code, table)
+        words, (before, _succ) = self.analyse(code, table)
         self.assertIsNone(pn.ppc_jump_table(words, 0x1000, before, bctr, memory(code, table).word))
 
     def test_jump_table_no_longer_proven_falls_back(self):
@@ -550,7 +552,8 @@ class MachOInput(unittest.TestCase):
                             ("x86", macho(cpu=7)),
                             ("no symtab", macho(symtab=False)),
                             ("truncated", good[:60]),
-                            ("universal without ppc", struct.pack(">2I5I", 0xCAFEBABE, 1, 7, 3, 28, len(good), 12) + good),
+                            ("universal without ppc",
+                             struct.pack(">2I5I", 0xCAFEBABE, 1, 7, 3, 28, len(good), 12) + good),
                             ("universal slice past end", struct.pack(">2I5I", 0xCAFEBABE, 1, 18, 0, 28, 10 ** 6, 12))):
             with self.subTest(label), self.assertRaises(SystemExit):
                 self.load(data)
@@ -587,7 +590,8 @@ class RepoNames(unittest.TestCase):
             return pn.windows_names()
 
     def test_conflicting_rows_are_not_paired_by_name(self):
-        row = lambda s, d, a: {"symbol": s, "demangled": d, "address": a, "role": "defines"}
+        def row(s, d, a):
+            return {"symbol": s, "demangled": d, "address": a, "role": "defines"}
         names, ambiguous = self.names(
             [row("?a@Foo@@QAEXXZ", "public: void __thiscall Foo::a(void)", "0x1000"),
              row("?b@Bar@@QAEXXZ", "public: void __thiscall Bar::b(void)", "0x1000"),
@@ -614,7 +618,8 @@ class RepoNames(unittest.TestCase):
         self.assertEqual(ambiguous, {0x1000, 0x2000})
 
     def test_several_parameter_lists_do_not_admit_a_third(self):
-        row = lambda d: {"symbol": "?f", "demangled": d, "address": "0x1000", "role": "defines"}
+        def row(d):
+            return {"symbol": "?f", "demangled": d, "address": "0x1000", "role": "defines"}
         names, _ = self.names([row("public: void __thiscall Foo::f(int)"),
                                row("public: void __thiscall Foo::f(float)")], [])
         pairs = pn.Pairs()

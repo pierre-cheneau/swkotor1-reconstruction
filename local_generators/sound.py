@@ -21,29 +21,29 @@ BLOBS = (('kotor_sound_data', 'eax_presets_0074c610', 0x74C610, 24 * 0x70),)
 
 
 def sound(image: OriginalImage, out: Path) -> None:
-    lines = ["// GENERATED LOCALLY from the user's swkotor.exe (sha256 %s) by gen_sound_data.py." % EXE_SHA256,
+    lines = [f"// GENERATED LOCALLY from the user's swkotor.exe (sha256 {EXE_SHA256}) by gen_sound_data.py.",
              '// D13: original .rdata bytes; do not commit or publish.', '']
     receipt = {'exe': str(image.path), 'exe_sha256': EXE_SHA256, 'items': []}
 
     def item(namespace, name, va, raw, **extra):
-        receipt['items'].append({'symbol': '%s::%s' % (namespace, name), 'va': '%08X' % va,
+        receipt['items'].append({'symbol': f'{namespace}::{name}', 'va': f'{va:08X}',
                                  'file_offset': image.file_offset(va), 'length': len(raw),
                                  'sha256': sha256(raw), **extra})
 
     for namespace, name, va in STRINGS:
         raw = image.cstring(va)
-        lines.append('namespace %s { extern const char %s[%d] = { %s }; }' % (namespace, name, len(raw), byte_list(raw)))
+        lines.append(f'namespace {namespace} {{ extern const char {name}[{len(raw)}] = {{ {byte_list(raw)} }}; }}')
         item(namespace, name, va, raw, text=raw[:-1].decode('latin1'))
     for namespace, name, va in FLOATS:
         raw = image.read(va, 4)
         bits, value = struct.unpack('<I', raw)[0], struct.unpack('<f', raw)[0]
-        lines.append('namespace %s { extern const float %s = %rf; static_assert(sizeof(float) == 4, "x86"); } '
-                     '// bits %08X' % (namespace, name, value, bits))
-        item(namespace, name, va, raw, bits='%08X' % bits)
+        lines.append(f'namespace {namespace} {{ extern const float {name} = {value!r}f; '
+                     f'static_assert(sizeof(float) == 4, "x86"); }} // bits {bits:08X}')
+        item(namespace, name, va, raw, bits=f'{bits:08X}')
     for namespace, name, va, size in BLOBS:
         raw = image.read(va, size)
-        lines.append('namespace %s { alignas(4) extern const unsigned char %s[%d] = { %s }; }'
-                     % (namespace, name, size, byte_list(raw)))
+        lines.append(f'namespace {namespace} {{ alignas(4) extern const unsigned char {name}[{size}] = '
+                     f'{{ {byte_list(raw)} }}; }}')
         item(namespace, name, va, raw)
     out.mkdir(parents=True, exist_ok=True)
     write_text(out / 'sound_data.cpp', '\n'.join(lines) + '\n', '\r\n')

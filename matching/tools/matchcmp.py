@@ -23,6 +23,7 @@ usage: python matchcmp.py --msvc DIR --exe swkotor.exe [-v] FILE_OR_DIR...
 import argparse
 import csv
 import difflib
+import itertools
 import os
 import re
 import shlex
@@ -54,7 +55,7 @@ def winpath(path):
 def run_tool(cmd, env=None):
     env = dict(os.environ if env is None else env)
     env.setdefault("WINEDEBUG", "-all")
-    return subprocess.run([*WINE, *cmd], capture_output=True, text=True, env=env)
+    return subprocess.run([*WINE, *cmd], capture_output=True, text=True, env=env, check=False)
 
 
 def start_wineserver():
@@ -68,8 +69,8 @@ def start_wineserver():
     if server and server.exists():
         quiet = dict(stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                      stderr=subprocess.DEVNULL, env=dict(os.environ, WINEDEBUG="-all"))
-        subprocess.run([str(server), "-p", "60"], **quiet)
-        subprocess.run([*WINE, "wineboot"], **quiet)
+        subprocess.run([str(server), "-p", "60"], **quiet, check=False)
+        subprocess.run([*WINE, "wineboot"], **quiet, check=False)
 
 
 def annotated_functions(path):
@@ -175,7 +176,7 @@ def function_extents(pe, table=None):
         text = src.read_text(encoding="utf-8", errors="replace")
         starts.update(int(m.group(1), 16) for m in ANNOTATION.finditer(text))
     starts = sorted(starts)
-    return {a: b - a for a, b in zip(starts, starts[1:])}
+    return {a: b - a for a, b in itertools.pairwise(starts)}
 
 
 def compare(original, compiled, masked, extent):

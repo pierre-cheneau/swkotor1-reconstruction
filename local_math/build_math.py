@@ -1,7 +1,7 @@
 """Mandatory local math generation and provider validation; never downloads inputs."""
-from pathlib import Path
 import json
 import sys
+from pathlib import Path
 
 INPUTS = ('local_math/build_math.py', 'local_math/gen_l1_asm.py', 'local_math/l1_bytegate.py',
           'local_math/providers.json', 'src/math/kotor_math.h', 'src/math/kotor_x87.h',

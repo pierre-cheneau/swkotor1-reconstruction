@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import synthetic_pe  # noqa: E402
+import synthetic_pe
 
 EXE_SHA = "9c10e0450a6eeca417e036e3cde7474fed1f0a92aab018446d156944dea91435"
 DLL_SHA = {"Mss32.dll": "858d6066bab4445f56c2d1713f16bfa742fb43a149c6afcb83460efe5bdec7da",

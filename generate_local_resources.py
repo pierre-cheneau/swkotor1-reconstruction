@@ -18,8 +18,19 @@ sys.path.insert(0, str(ROOT))
 
 import pefile  # noqa: E402  (installed separately; checked before any output exists)
 
-from local_generators import controller, diagnostic_literals, game_prepare, imports, literals  # noqa: E402
-from local_generators import pow_constants, renderer, resources, rules, sound, warning_locale  # noqa: E402
+from local_generators import (  # noqa: E402  # noqa: E402
+    controller,
+    diagnostic_literals,
+    game_prepare,
+    imports,
+    literals,
+    pow_constants,
+    renderer,
+    resources,
+    rules,
+    sound,
+    warning_locale,
+)
 from local_generators.original import EXE_SHA256, SPECS, OriginalImage, sha256, write_text  # noqa: E402
 
 # Output directory -> (spec, generated header name) of the renderer data groups.
@@ -92,10 +103,13 @@ def generate(game: Path, out: Path, rules_src: Path | None, renderer_spec: Path,
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--game-dir", type=Path, required=True)
-    parser.add_argument("--out", type=Path, required=True, help="New private output outside this source tree and game install")
+    parser.add_argument("--out", type=Path, required=True,
+                        help="New private output outside this source tree and game install")
     parser.add_argument("--rules-src", type=Path, help="Reviewed rules source directory, read only")
-    parser.add_argument("--renderer-spec", type=Path, help="Reviewed renderer address specification; default is the six-object GL specification")
-    parser.add_argument("--lib-exe", type=Path, help="Optional installed MSVC x86 lib.exe; enables middleware import generation")
+    parser.add_argument("--renderer-spec", type=Path,
+                        help="Reviewed renderer address specification; default is the six-object GL specification")
+    parser.add_argument("--lib-exe", type=Path,
+                        help="Optional installed MSVC x86 lib.exe; enables middleware import generation")
     args = parser.parse_args()
     generate(args.game_dir.resolve(strict=True), args.out.resolve(),
              args.rules_src.resolve(strict=True) if args.rules_src else None,

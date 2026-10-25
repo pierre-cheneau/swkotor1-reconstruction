@@ -83,15 +83,15 @@ const char kotor_rdata_str_0078d200[%d] = {%s}; // InitGameApp 004040C0/004040F5
 
 
 def chars(data: bytes) -> str:
-    return ', '.join('0x%02X' % c for c in data)
+    return ', '.join(f'0x{c:02X}' for c in data)
 
 
 def game_prepare(image: OriginalImage, out: Path) -> None:
     check = []
 
     def record(field, va, data, offset, source, emitted, evidence=''):
-        check.append({'field': field, 'address': '%08X' % va,
-                      'file_offset': None if offset is None else '%X' % offset,
+        check.append({'field': field, 'address': f'{va:08X}',
+                      'file_offset': None if offset is None else f'{offset:X}',
                       'length': len(data), 'image_bytes_le': data.hex(), 'sha256': sha256(data),
                       'source': source, 'emitted': emitted, 'evidence': evidence})
 
@@ -100,27 +100,27 @@ def game_prepare(image: OriginalImage, out: Path) -> None:
         value = int.from_bytes(data, 'little')
         if kind == 'f':
             if value != 0:
-                raise ValueError('nonzero float needs bit-exact emission at %x' % va)
+                raise ValueError(f'nonzero float needs bit-exact emission at {va:x}')
             literal = '0.0f'
         else:
-            literal = {'u': '0x%Xu' % value, 'u64': '0x%XULL' % value, 'c': '%d' % value,
-                       'i': '%d' % (value - (1 << 32) if value >= 1 << 31 else value)}[kind]
+            literal = {'u': f'0x{value:X}u', 'u64': f'0x{value:X}ULL', 'c': f'{value}',
+                       'i': f'{value - (1 << 32) if value >= 1 << 31 else value}'}[kind]
         record(field, va, data, offset, source, literal)
         return literal
 
     def cstr_bytes(va):
         data, offset, source = image.read_loaded(va, 256)
         text = data.split(b'\0')[0] + b'\0'
-        record('string %08X' % va, va, text, offset, source, 'char[%d]' % len(text))
+        record(f'string {va:08X}', va, text, offset, source, f'char[{len(text)}]')
         return text
 
-    winmain = ['    /* %-16s %08X */ %s' % (n, va, num('winmain.' + n, va, s, k)) for n, va, s, k in WINMAIN]
-    strings = ['    /* %-16s %08X loader image, before staticInit */ {%s, %s}'
-               % (n, va, num('shell.%s.data' % n, va, 4), num('shell.%s.length' % n, va + 4, 4))
+    winmain = [f'    /* {n:<16} {va:08X} */ {num("winmain." + n, va, s, k)}' for n, va, s, k in WINMAIN]
+    strings = [f'    /* {n:<16} {va:08X} loader image, before staticInit */ '
+               f'{{{num(f"shell.{n}.data", va, 4)}, {num(f"shell.{n}.length", va + 4, 4)}}}'
                for n, va in SHELL_STRINGS]
-    enables = ['    /* %08X */ %s' % (va, num('shell.enable_%06x' % va, va, 4)) for va in SHELL_ENABLES]
-    reinit = ['    /* %-6s %08X */ %s' % (n, va, num('reinit.' + n, va, 4)) for n, va in REINIT]
-    message = ['    /* %-16s %08X */ %s' % (n, va, num('message.' + n, va, 4)) for n, va in MESSAGE]
+    enables = [f'    /* {va:08X} */ {num(f"shell.enable_{va:06x}", va, 4)}' for va in SHELL_ENABLES]
+    reinit = [f'    /* {n:<6} {va:08X} */ {num("reinit." + n, va, 4)}' for n, va in REINIT]
+    message = [f'    /* {n:<16} {va:08X} */ {num("message." + n, va, 4)}' for n, va in MESSAGE]
     render_class, offset, source = image.read_loaded(0x73d684, 14)
     record('shell_constants.render_class', 0x73d684, render_class, offset, source, 'char[14]', '00403708..00403736')
     top = cstr_bytes(0x78d200)
@@ -131,18 +131,20 @@ def game_prepare(image: OriginalImage, out: Path) -> None:
         data, offset, source = image.read_loaded(va, size)
         value = int.from_bytes(data, 'little')
         if kind == 'void*' and value != 0:
-            raise ValueError('nonzero pointer cell %x' % va)
-        literal = 'nullptr' if kind == 'void*' else '0x%Xu' % value
+            raise ValueError(f'nonzero pointer cell {va:x}')
+        literal = 'nullptr' if kind == 'void*' else f'0x{value:X}u'
         record(name, va, data, offset, source, literal, evidence)
-        cells.append('%s %s = %s; // %08X (%s); %s' % (kind, name, literal, va, source, evidence))
+        cells.append(f'{kind} {name} = {literal}; // {va:08X} ({source}); {evidence}')
     rdata = []
     for va, evidence in STRINGS:
         text = cstr_bytes(va)
-        rdata.append('const char kotor_rdata_str_%08x[%d] = {%s}; // %s' % (va, len(text), chars(text), evidence))
+        rdata.append(f'const char kotor_rdata_str_{va:08x}[{len(text)}] = {{{chars(text)}}}; // {evidence}')
 
-    source_text = TEMPLATE % (image.sha256, ',\n'.join(winmain), ',\n'.join(strings), ',\n'.join(enables),
-                              ',\n'.join(reinit), ',\n'.join(message), chars(render_class), blend_source,
-                              blend_destination, '\n'.join(cells), len(top), chars(top), '\n'.join(rdata))
+    # TEMPLATE is C++ full of braces, so it keeps %-placeholders rather than str.format fields.
+    source_text = TEMPLATE % (image.sha256, ',\n'.join(winmain), ',\n'.join(strings),
+                              ',\n'.join(enables), ',\n'.join(reinit), ',\n'.join(message), chars(render_class),
+                              blend_source, blend_destination, '\n'.join(cells), len(top), chars(top),
+                              '\n'.join(rdata))
     out.mkdir(parents=True, exist_ok=True)
     write_text(out / 'prepare_image_data.cpp', source_text, '\r\n')
     write_text(out / 'NEVER-COMMIT.txt', 'Generated from original game bytes (D13). Do not commit, publish '

@@ -83,8 +83,9 @@ def test_clang_must_be_the_tested_release(tmp_path: Path, monkeypatch) -> None:
     clang = tmp_path / "clang-cl.exe"
     clang.write_bytes(b"")
     target = {"units": [{"compiler": "clang-cl"}]}
-    monkeypatch.setattr(subprocess, "run", lambda *a, **k: subprocess.CompletedProcess(a, 0, "clang version 18.1.0\n", ""))
-    with pytest.raises(ValueError, match="LLVM 23.1.2"):
+    monkeypatch.setattr(subprocess, "run",
+                        lambda *a, **k: subprocess.CompletedProcess(a, 0, "clang version 18.1.0\n", ""))
+    with pytest.raises(ValueError, match=r"LLVM 23\.1\.2"):
         build.verify_clang(target, clang, {})
     with pytest.raises(ValueError, match="--clang-cl"):
         build.verify_clang(target, None, {})

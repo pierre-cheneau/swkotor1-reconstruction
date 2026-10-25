@@ -16,8 +16,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import l1_fixture  # noqa: E402
-import synthetic_pe  # noqa: E402
+import l1_fixture
+import synthetic_pe
 
 CHECKOUT = Path(__file__).resolve().parents[1]
 EXE_SHA = "9c10e0450a6eeca417e036e3cde7474fed1f0a92aab018446d156944dea91435"

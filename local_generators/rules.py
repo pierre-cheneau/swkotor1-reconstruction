@@ -39,31 +39,33 @@ def rules(image: OriginalImage, src: Path, out: Path) -> None:
     check, declarations, definitions = [], [], []
     for va in sorted(strings):
         if image.section(va).name not in ('.rdata', '.data'):
-            raise ValueError('%08X not in .rdata/.data' % va)
+            raise ValueError(f'{va:08X} not in .rdata/.data')
         data = image.cstring(va)
         consumers = sorted(strings[va])
-        check.append({'name': 'kotor_rules_str_%08x' % va, 'address': '%08X' % va,
-                      'file_offset': '%X' % image.file_offset(va), 'length': len(data),
+        check.append({'name': f'kotor_rules_str_{va:08x}', 'address': f'{va:08X}',
+                      'file_offset': f'{image.file_offset(va):X}', 'length': len(data),
                       'sha256': sha256(data), 'consumers': consumers})
-        declarations.append('extern const char kotor_rules_str_%08x[%d];  // %s' % (va, len(data), ', '.join(consumers)))
-        definitions.append('const char kotor_rules_str_%08x[%d] = {%s};'
-                           % (va, len(data), ', '.join('0x%02X' % c for c in data)))
+        declarations.append(f'extern const char kotor_rules_str_{va:08x}[{len(data)}];  // {", ".join(consumers)}')
+        definitions.append(f'const char kotor_rules_str_{va:08x}[{len(data)}] = '
+                           f'{{{", ".join(f"0x{c:02X}" for c in data)}}};')
     for (va, bits), files in sorted(cells.items()):
         if image.section(va).name != '.data':
-            raise ValueError('%08X not in .data' % va)
+            raise ValueError(f'{va:08X} not in .data')
         data, offset, source = image.read_loaded(va, bits // 8)
-        name = 'kotor_rules_cell%d_%08x' % (bits, va)
-        check.append({'name': name, 'address': '%08X' % va, 'file_offset': None if offset is None else '%X' % offset,
-                      'length': len(data), 'source': source, 'sha256': sha256(data), 'consumers': sorted(files)})
-        declarations.append('extern %s %s;  // %s' % (CELL_TYPES[bits], name, ', '.join(sorted(files))))
-        definitions.append('%s %s = 0x%Xu;' % (CELL_TYPES[bits], name, int.from_bytes(data, 'little')))
+        name = f'kotor_rules_cell{bits}_{va:08x}'
+        check.append({'name': name, 'address': f'{va:08X}',
+                      'file_offset': None if offset is None else f'{offset:X}', 'length': len(data),
+                      'source': source, 'sha256': sha256(data), 'consumers': sorted(files)})
+        declarations.append(f'extern {CELL_TYPES[bits]} {name};  // {", ".join(sorted(files))}')
+        definitions.append(f'{CELL_TYPES[bits]} {name} = 0x{int.from_bytes(data, "little"):X}u;')
     out.mkdir(parents=True, exist_ok=True)
     write_text(out / 'rules_image_data.h',
                '#pragma once\n// GENERATED declarations (no original bytes) by tools/gen_rules_image_data.py.\n'
                '// Definitions exist ONLY in the locally generated, never-committed rules_image_data.cpp (D13).\n'
                '#include <cstdint>\nextern "C" {\n' + '\n'.join(declarations) + '\n}\n', '\n')
+    definitions_text = '\n'.join(definitions)
     write_text(out / 'rules_image_data.cpp',
-               '// GENERATED - NEVER COMMIT (D13). tools/gen_rules_image_data.py from swkotor.exe sha256 %s.\n'
-               '#include "rules_image_data.h"\nextern "C" {\n%s\n}\n' % (image.sha256, '\n'.join(definitions)), '\n')
+               f'// GENERATED - NEVER COMMIT (D13). tools/gen_rules_image_data.py from swkotor.exe sha256 '
+               f'{image.sha256}.\n#include "rules_image_data.h"\nextern "C" {{\n{definitions_text}\n}}\n', '\n')
     write_text(out / 'IMAGE-CHECK.json', json.dumps({'exe_sha256': image.sha256, 'values': check}, indent=1), '\r\n')
     write_text(out / 'NEVER-COMMIT', 'D13 generated original bytes\n', '\r\n')

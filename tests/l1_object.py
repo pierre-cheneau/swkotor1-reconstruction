@@ -34,8 +34,8 @@ def build(exe: Path, layout_path: Path, out: Path) -> tuple[Path, Path]:
     # Data sections: blocks in order, each label at its offset.
     sections = {".rdata": bytearray(), ".data": bytearray()}
     where: dict[int, tuple[str, int]] = {}
-    for s, e, segment in layout["blocks"]:
-        s, e = int(s, 16), int(e, 16)
+    for start, end, segment in layout["blocks"]:
+        s, e = int(start, 16), int(end, 16)
         section = ".data" if segment in "DB" else ".rdata"
         where[s] = (section, len(sections[section]))
         sections[section] += image[s - base:e - base] if s < FILE_END else bytes(e - s)

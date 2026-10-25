@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import json
 import random
-import re
 import struct
 from pathlib import Path
 
@@ -182,8 +181,8 @@ def _pe(sections: list[tuple[bytes, int, int, bytes, int]], directories: dict[in
         struct.pack_into("<II", headers, 0x98 + 96 + 8 * index, rva, size)
     body = bytearray()
     raw_pointer = ALIGNMENT
-    for k, (name, va, vsize, raw, characteristics) in enumerate(sections):
-        raw = raw + bytes(-len(raw) % ALIGNMENT)
+    for k, (name, va, vsize, data, characteristics) in enumerate(sections):
+        raw = data + bytes(-len(data) % ALIGNMENT)
         struct.pack_into("<8sIIIIIIHHI", headers, 0x178 + 40 * k, name, vsize, va - image_base,
                          len(raw), raw_pointer, 0, 0, 0, 0, characteristics)
         body += raw

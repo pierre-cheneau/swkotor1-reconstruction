@@ -315,7 +315,8 @@ class Transcription:
                 w(f'{data_label(a)} LABEL BYTE')
             if a in ptrs:
                 target = original.u32(a)
-                w(f'    dd OFFSET {self.label(target) if target in ENTRY else data_label(target)} ; {a:08X} -> {target:08X}')
+                name = self.label(target) if target in ENTRY else data_label(target)
+                w(f'    dd OFFSET {name} ; {a:08X} -> {target:08X}')
                 a += 4
                 continue
             nxt = min([x for x in [*self.refs, *ptrs, e] if a < x <= e] + [a + 16])
@@ -337,7 +338,8 @@ class Transcription:
                 if a in self.refs:
                     lines.append(f'{data_label(a)} LABEL BYTE')
                 nxt = min([x for x in self.refs if a < x < e] + [(a // 16 + 1) * 16, e])
-                lines.append(f"    db {', '.join(hexs(x) for x in self.original.image[a - self.original.base:nxt - self.original.base])} ; {a:08X}")
+                data = self.original.image[a - self.original.base:nxt - self.original.base]
+                lines.append(f"    db {', '.join(hexs(x) for x in data)} ; {a:08X}")
                 a = nxt
         return lines
 

@@ -24,7 +24,7 @@ def transcription(tmp_path_factory):
 def gate(transcription, obj: Path, *extra: str) -> subprocess.CompletedProcess:
     exe, code, _, lst, layout = transcription
     return subprocess.run([sys.executable, "-B", str(code / "l1_bytegate.py"), str(exe), str(obj), str(lst),
-                           str(layout), *extra], capture_output=True, text=True)
+                           str(layout), *extra], capture_output=True, text=True, check=False)
 
 
 def test_gate_passes_the_faithful_transcription(transcription) -> None:
@@ -48,5 +48,6 @@ def test_gate_catches_a_changed_instruction(transcription, tmp_path: Path) -> No
 
 def test_gate_requires_its_four_inputs(transcription) -> None:
     exe, code, *_ = transcription
-    run = subprocess.run([sys.executable, "-B", str(code / "l1_bytegate.py"), str(exe)], capture_output=True, text=True)
+    run = subprocess.run([sys.executable, "-B", str(code / "l1_bytegate.py"), str(exe)],
+                         capture_output=True, text=True, check=False)
     assert run.returncode == 1 and "l1_bytegate.py <swkotor.exe> <obj> <lst> <l1_layout.json>" in run.stderr

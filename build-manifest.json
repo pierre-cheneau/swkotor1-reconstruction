@@ -92489,7 +92489,7 @@
         },
         {
           "path": "generate_local_resources.py",
-          "sha256": "ddc217f0f8dae26eabccdb9033bcf7b2882d28a446711b7dde94731b873bb563"
+          "sha256": "7e9060add638662804ece188d05083f96b142e50a588aeb4e7df8316ef323600"
         },
         {
           "path": "local_generators/controller.py",
@@ -92505,7 +92505,7 @@
         },
         {
           "path": "local_generators/game_prepare.py",
-          "sha256": "acb8b94159ebb4df86cd9bf501c8636409bcea1181a840042a986d33523154b1"
+          "sha256": "d5c24fab977377e43154886ca589b97fa652cd10d1f0888d71c1a8f1d6898c83"
         },
         {
           "path": "local_generators/mesh-spec.json",
@@ -92533,11 +92533,11 @@
         },
         {
           "path": "local_generators/rules.py",
-          "sha256": "9986edbcc53f576276326f797f7ee4910b2e880e869d0f1f301e8b4e34fc88a6"
+          "sha256": "e15415ce49ce6c7b9eddff3a4e896bb6421570e07808d164ae7a2453fadb7d11"
         },
         {
           "path": "local_generators/sound.py",
-          "sha256": "bc3e902d9b5145519c502c24aba16e4b69a0742ef4608c6c52d5576cd4f6199e"
+          "sha256": "9db8a76b4c89dfb3c8ac7c4c32eed31685f8cb0728038d7c57d1782287923cb1"
         },
         {
           "path": "local_generators/vp-data-spec.json",
@@ -92633,7 +92633,7 @@
         },
         {
           "path": "local_generators/original.py",
-          "sha256": "31597526d620bdddf101b2c2cdde326dd802e11698872315da8c2805eb6dbb05"
+          "sha256": "51e30d17a8a63096468db1c5999c8ee8c9ee2d3700b86b19a6001a1d8f6c07f5"
         },
         {
           "path": "local_generators/literals.py",
@@ -92645,7 +92645,7 @@
         },
         {
           "path": "local_generators/imports.py",
-          "sha256": "cb38218267181d79e73b6d59729f1ef0d23b9718d460d80a643f2de5a4b1a4b2"
+          "sha256": "f0b0bbf184547a5dff02d333de49dd31c137fd4ef685c26a300e01a09f2bea42"
         },
         {
           "path": "src/minigames/claude_turret_t1_leaves.cpp",
@@ -93241,15 +93241,15 @@
         },
         {
           "path": "local_math/build_math.py",
-          "sha256": "c113cea5ee81e031841c70f1b32aa3aeefb1d202992b30917fe77130ee46a810"
+          "sha256": "cf800dcd027be5b04bb21bff2448685dfa8bb3a6eb6e95d00653913770180a56"
         },
         {
           "path": "local_math/gen_l1_asm.py",
-          "sha256": "cf2e1e25f8bc3a92918e7c2ff4568ddf1c4507b3ca8160597dbe22ae8c84dbd4"
+          "sha256": "7e21902683d05aadaad4c4565dfa565197d6eda48e7d2168ef1a56b2c8b205fe"
         },
         {
           "path": "local_math/l1_bytegate.py",
-          "sha256": "b3490b60902bb141c62a4e818db4ec054bb0839372846aacca6ee32c3c67c117"
+          "sha256": "eacaa2d7d33ac2a8784c00041f7469b01e25c3100eef3cf808cd94a16267072b"
         },
         {
           "path": "local_math/providers.json",

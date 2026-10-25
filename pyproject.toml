@@ -34,4 +34,14 @@ ignore = [
     "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR0917",
     "PLC0415",  # optional dependencies are imported where used
     "RUF001", "RUF002", "RUF003",  # typographic characters in user-facing text
+    "B905",     # zip() pairs sequences of deliberately different lengths
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# The transcription's address tables and emitted comment text stay one item per line.
+"local_math/gen_l1_asm.py" = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["local_generators", "local_math", "build", "pin_sources", "coff", "playable", "matchcmp",
+                     "symbolmap", "libmatch", "ppcnames", "render_banner", "todo", "synthetic_pe", "synthetic_coff",
+                     "generator_harness", "build_harness", "math_harness", "l1_fixture", "l1_object"]

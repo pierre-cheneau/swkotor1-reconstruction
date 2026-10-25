@@ -192,8 +192,8 @@ class Gate:
     def check_data(self):
         fail = self.failures.append
         checked = 0
-        for s, e, segment in self.layout['blocks']:
-            s, e = int(s, 16), int(e, 16)
+        for start, end, segment in self.layout['blocks']:
+            s, e = int(start, 16), int(end, 16)
             name = '.data' if segment in 'DB' else '.rdata'
             hits = [o for (section, o), v in self.location.items() if section == name and v == s]
             if not hits:
