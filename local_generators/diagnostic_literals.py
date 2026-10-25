@@ -1,8 +1,11 @@
-"""Generate original diagnostic literals locally; generated output must stay private."""
-from pathlib import Path
-import hashlib
+"""Original diagnostic literals; the generated output must stay private."""
+from __future__ import annotations
 
-EXE_SHA = "9c10e0450a6eeca417e036e3cde7474fed1f0a92aab018446d156944dea91435"
+from pathlib import Path
+
+from .original import OriginalImage, write_text
+
+# (symbol, address, longest the literal may be, NUL included)
 LITERALS = (
     ("diagnostic_source_0074e208", 0x0074E208, 92),
     ("diagnostic_empty_0074e360", 0x0074E360, 128),
@@ -11,22 +14,13 @@ LITERALS = (
 )
 
 
-def diagnostic_literals(executable: Path, output: Path) -> None:
-    import pefile
-    if hashlib.sha256(executable.read_bytes()).hexdigest() != EXE_SHA:
-        raise ValueError("Unsupported original executable")
+def diagnostic_literals(image: OriginalImage, output: Path) -> None:
     lines = ["// Generated original game data: keep local and ignored.",
              "namespace base_ini_reconstruction {"]
-    with pefile.PE(str(executable), fast_load=True) as pe:
-        for symbol, address, bound in LITERALS:
-            data = pe.get_data(address - pe.OPTIONAL_HEADER.ImageBase, bound)
-            terminator = data.find(b"\0")
-            if terminator < 1 or any(byte >= 128 for byte in data[:terminator]):
-                raise ValueError("Invalid bounded original diagnostic literal")
-            data = data[:terminator + 1]
-            values = ",".join(str(byte) for byte in data)
-            lines.append(f"extern const char {symbol}[] = {{{values}}};")
-    if hashlib.sha256(executable.read_bytes()).hexdigest() != EXE_SHA:
-        raise ValueError("Executable changed during generation")
+    for symbol, address, bound in LITERALS:
+        data = image.cstring(address, limit=bound)
+        if len(data) < 2 or any(byte >= 128 for byte in data):
+            raise ValueError("Invalid bounded original diagnostic literal")
+        lines.append(f"extern const char {symbol}[] = {{{','.join(map(str, data))}}};")
     lines.append("}")
-    output.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    write_text(output, "\n".join(lines) + "\n", "\r\n")

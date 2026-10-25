@@ -92489,11 +92489,11 @@
         },
         {
           "path": "generate_local_resources.py",
-          "sha256": "b6d62f5548dee084574629f840bf76766fe116af74a079878e5aee0803fbd467"
+          "sha256": "ddc217f0f8dae26eabccdb9033bcf7b2882d28a446711b7dde94731b873bb563"
         },
         {
           "path": "local_generators/controller.py",
-          "sha256": "4ca0a0c7c64385c54f276755facdd920d7eb6b07b1189b0b893165b143eed00d"
+          "sha256": "e845faccccaee1c77d771ca957d01ec11352b11d0e7e753f9a922054f681d062"
         },
         {
           "path": "local_generators/epoch-spec.json",
@@ -92505,7 +92505,7 @@
         },
         {
           "path": "local_generators/game_prepare.py",
-          "sha256": "bc0337b1191cf1e0b4c8b1b81f22ba9bed924890d6a02227a1d790eecce5347f"
+          "sha256": "acb8b94159ebb4df86cd9bf501c8636409bcea1181a840042a986d33523154b1"
         },
         {
           "path": "local_generators/mesh-spec.json",
@@ -92517,7 +92517,7 @@
         },
         {
           "path": "local_generators/pow_constants.py",
-          "sha256": "2739b31a84050b863ab92cc3c159d9ac64a019857951c2de75ce8eea49d753bc"
+          "sha256": "8f965061080c7817162854640ed07e710fa0885613d6010ee4827d4aae8ee8e5"
         },
         {
           "path": "local_generators/renderer-spec.json",
@@ -92525,7 +92525,7 @@
         },
         {
           "path": "local_generators/renderer.py",
-          "sha256": "6f68ede3169e0d3610d7fc4132de7573ecbe88790a11c2ea8a682a75cc4c6372"
+          "sha256": "a2c56c32ada1f52d56c6146b10d906538ed0c4b330ee07c4f0c518d2976809d1"
         },
         {
           "path": "local_generators/resource-pairs-spec.json",
@@ -92533,11 +92533,11 @@
         },
         {
           "path": "local_generators/rules.py",
-          "sha256": "2407c2f02fd6814c7b59a7a59f85a398ea64da3cab6ef488ad792af3dcfe0043"
+          "sha256": "9986edbcc53f576276326f797f7ee4910b2e880e869d0f1f301e8b4e34fc88a6"
         },
         {
           "path": "local_generators/sound.py",
-          "sha256": "17ffef1be27e4cbf51a2791056bf4a8a4c2cfe168d89556c36a8458685709249"
+          "sha256": "bc3e902d9b5145519c502c24aba16e4b69a0742ef4608c6c52d5576cd4f6199e"
         },
         {
           "path": "local_generators/vp-data-spec.json",
@@ -92617,7 +92617,7 @@
         },
         {
           "path": "local_generators/diagnostic_literals.py",
-          "sha256": "5cbaa39b1c29a750dafc719ccb6cf376cf6c1a43c1a98f1c82a7db811b73550d"
+          "sha256": "98e7bf1aa2d8d5a6e13a543520030f3eb10b2fee2584535ed99c605fb6243078"
         },
         {
           "path": "local_generators/warning-locale-spec.json",
@@ -92625,7 +92625,27 @@
         },
         {
           "path": "local_generators/warning_locale.py",
-          "sha256": "113436047e2acb283eb736b9210b12513a7c9c3db2f2a1cd218027c74c198797"
+          "sha256": "771f105d236c2e1769787b57c611086319980b05c00e3d20e4ffb2066ae03c25"
+        },
+        {
+          "path": "local_generators/__init__.py",
+          "sha256": "f15dff98e36efe7361a4cfb583173d3a6cc8b20c95ffae78d684a764a8e47e89"
+        },
+        {
+          "path": "local_generators/original.py",
+          "sha256": "31597526d620bdddf101b2c2cdde326dd802e11698872315da8c2805eb6dbb05"
+        },
+        {
+          "path": "local_generators/literals.py",
+          "sha256": "62db9e2dc24af2c2c6a19b517933ecae65e96545d847a7638817ff3adef08805"
+        },
+        {
+          "path": "local_generators/resources.py",
+          "sha256": "93c48d9cbc91a86297a0eaf42f5642f6f52c841f1e71a91ffdfdcffd68a3408c"
+        },
+        {
+          "path": "local_generators/imports.py",
+          "sha256": "cb38218267181d79e73b6d59729f1ef0d23b9718d460d80a643f2de5a4b1a4b2"
         },
         {
           "path": "src/minigames/claude_turret_t1_leaves.cpp",

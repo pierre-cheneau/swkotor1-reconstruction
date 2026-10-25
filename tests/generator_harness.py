@@ -96,6 +96,8 @@ def run_generators(code_root: Path, work: Path) -> dict[str, str]:
     librarian = work.resolve() / "msvc" / "lib.exe"
     librarian.parent.mkdir()
     librarian.write_bytes(b"")
+    for name in [m for m in sys.modules if m == "local_generators" or m.startswith("local_generators.")]:
+        del sys.modules[name]            # each revision imports its own copy
     argv, real_run = sys.argv, subprocess.run
     sys.argv = ["generate_local_resources.py", "--game-dir", str(game), "--out", str(out),
                 "--rules-src", str(code / RULES), "--lib-exe", str(librarian)]
