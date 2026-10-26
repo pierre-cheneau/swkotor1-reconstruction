@@ -40,7 +40,7 @@ REVIEWED_COMPILER_FLAGS = {
     "/arch:IA32", "/arch:SSE2", "/Brepro", "/Zc:sizedDealloc-", "--target=i686-pc-windows-msvc",
     "--no-default-config", "/clang:-fms-compatibility-version=19.44", "/clang:-Wno-invalid-offsetof",
     "/clang:-Wno-nontrivial-memcall", "/clang:-Wno-uninitialized-const-pointer", "/clang:-Wno-unused-function",
-    "/clang:-ffp-contract=off", "/clang:-mfpmath=387", "/clang:-mno-sse",
+    "/clang:-ffp-contract=off", "/clang:-mfpmath=387", "/clang:-mno-sse", "/clang:-march=i686",
 }
 REVIEWED_DEFINE = re.compile(r"/D[A-Za-z_][A-Za-z0-9_]*(?:=[A-Za-z0-9_+-]+)?")
 REVIEWED_LINK_FLAGS = {"/SUBSYSTEM:CONSOLE", "/SUBSYSTEM:WINDOWS", "/OPT:NOREF", "/OPT:NOICF", "/DYNAMICBASE:NO",

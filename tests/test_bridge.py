@@ -563,3 +563,14 @@ def test_a_forward_may_give_the_signature_symbols_csv_lacks(tmp_path: Path) -> N
     assert (forward.function.name, forward.symbol) == ("~CExoString", "frame_LogStringDtor_005e5c20")
     with pytest.raises(ValueError, match="the slice declares no"):
         u.forward(0x004BA820, spec, "class CExoString { public: char* m_sString; };")
+
+
+def test_a_global_declared_by_several_headers_is_bound_once_and_only_if_used(playable) -> None:
+    t = tables(globals_={"g_pAppManager": {0x007A39FC}})
+    twice = "class CAppManager;\nextern CAppManager* g_pAppManager;\nextern CAppManager* g_pAppManager;\n"
+    body, bound, _ = unit(t, playable).bind_globals(twice)
+    assert bound == [] and body == twice                    # two declarations are not a use
+    body, bound, _ = unit(t, playable).bind_globals(twice + "int use() { return g_pAppManager != 0; }\n")
+    assert [name for name, _ in bound] == ["g_pAppManager"]
+    assert body.count("kotor_bridge::ref<CAppManager*> g_pAppManager =") == 1
+    assert "// g_pAppManager: bound above" in body

@@ -16,6 +16,8 @@ public:
     CExoString& operator=(const CExoString& s);     // 0x005E5C50
     CExoString& operator=(const char* s);           // 0x005E5140
     CExoString operator+(const CExoString& s) const;    // 0x005E5D10
+    int IsEmpty() const;                          // 0x005E58A0
+    int AsINT() const;                            // 0x005E5630
     int GetLength() const;                          // 0x005E5790
     char* CStr() const;                             // 0x005E5670
     void Format(const char* szFormat, ...);         // 0x005E5680
@@ -66,6 +68,7 @@ public:
     short m_nHeight;                                // 0x6e
 
     void PlayGuiSound(char nSound);                 // 0x0040A140
+    CSWGuiPanel* PopModalPanel();                    // 0x0040BE00
     void GetSafeMargins(int* pX, int* pY);          // 0x00409EE0
     static CExoString GetScreenResolutionString(int nWidth, int nHeight);  // 0x0040A3E0
     void AddPanel(CSWGuiPanel* pPanel, int nFlags, int bPlaySound);   // 0x0040BC70
@@ -80,11 +83,15 @@ public:
     void SetText(const CExoString& sText);          // 0x00415E00
     void SetBaseFont(const CResRef& cFont);         // 0x00415DD0
     void SetStrRef(int nStrRef);                    // 0x00415E50
+    CSWGuiTextParams& operator=(const CSWGuiTextParams& p); // 0x004171E0
     CExoString m_sText;                             // 0x00
-    char pad_0x8[0x50];
+    char pad_0x8[0x30];
+    unsigned long m_nFlags; // 0x38
+    char pad_0x3c[0x1c];
 };
 
 class CSWGuiControl;
+class CSWGuiSlider;
 class CSWGuiLabel;
 class CSWGuiLabelHilight;
 
@@ -99,18 +106,23 @@ public:
     virtual void v20(); virtual void v24(); virtual void v28(); virtual void v2C();
     virtual void v30(); virtual void v34(); virtual void v38();
     virtual void HandleInputEvent(int nEvent, int bDown);   // 0x3c
-    virtual void v40(); virtual void v44(); virtual void v48(); virtual void v4C();
+    virtual void v40();
+    virtual CSWGuiControl* HitCheckMouse(int x, int y); // 0x44 (0x004187C0)
+    virtual void v48(); virtual void v4C();
     virtual CSWGuiLabel* GetLabel();                // 0x50
     virtual CSWGuiLabelHilight* GetLabelHilight();          // 0x54
     virtual int IsSelectable();                     // 0x58
     virtual void v5C();
-    virtual void v60(); virtual void v64(); virtual void v68(); virtual void v6C();
+    virtual void v60(); virtual CSWGuiSlider* GetSlider(); virtual void v68(); virtual void v6C();
     virtual void v70(); virtual void v74(); virtual void v78(); virtual void v7C();
     virtual void v80(); virtual void v84(); virtual void SetEnabled(int bEnabled);  /* 0x88 */ virtual void v8C();
     virtual void v90(); virtual void v94();
 
     CSWGuiExtent m_extent;                          // 0x04
-    char pad_0x14[0x30];
+    CSWGuiControl* m_pParentControl;               // 0x14
+    char pad_0x18[0x1c];
+    void* m_pOwner;                                // 0x34
+    char pad_0x38[0xc];
     union {
         unsigned long m_nFlags;                     // 0x44
         struct {
@@ -129,6 +141,7 @@ public:
     int GetUserData() { return m_n50; }
     void AddEvent(int nEvent, CSWGuiPanel* pObject,
                   void (CSWGuiPanel::*pfnCallback)(CSWGuiControl*));   // 0x0041AB20
+    void AddChildControl(CSWGuiControl* pControl);                    // 0x0041ACC0
 };
 
 // The dialog clears its controls' visible bit through a control pointer
@@ -149,6 +162,11 @@ public:
 // Border/fill parameters embedded in controls (+0x70 in a label).
 class CSWGuiBorderParams {
 public:
+    CSWGuiBorderParams(const CResRef& cCorner, const CResRef& cEdge, const CResRef& cFill,
+                       int nStyle, int nCornerSize, float fEdgeScale, const Vector& vColor,
+                       int nPulse);                // 0x00415000
+    CSWGuiBorderParams& operator=(const CSWGuiBorderParams& p); // 0x004150C0
+    void SetBorder(class CSWGuiBorder* pBorder);
     int GetCornerSize();                            // 0x00414CD0
     void SetFlags(int b2, int b3, int b4);          // 0x00414D00
     void SetFillImage(const CResRef& cResRef, int bForce);  // 0x00414C00
@@ -245,7 +263,8 @@ public:
     CSWGuiExtent m_extent;                          // 0x04
     int m_bUpdateFonts;                             // 0x14
     CSWGuiManager* m_pManager;                      // 0x18
-    char pad_0x1c[0x28];
+    CSWGuiControl* m_pControl1c;                    // 0x1c
+    char pad_0x20[0x24];
     unsigned long m_nFlags;                         // 0x44
     unsigned char m_nResolution;                    // 0x48
     float m_fAlpha;                                 // 0x4c
@@ -257,6 +276,8 @@ public:
     void InitControl(CSWGuiControl* pControl, const CExoString& sName, int bAdd);  // 0x0040B930
     void UnloadResource();                          // 0x0040B8F0
     void SetToDestroy(int bDestroy);                // 0x00624A00
+    void CenterPanel(); // 0x0040A600
+    void SetVisible(int bVisible);                   // 0x0040B9D0
     void SetCloseCallback(CSWGuiPanel* pObject, void (CSWGuiPanel::*pfnCallback)(CSWGuiControl*),
                           int nArg);                // 0x00624A40
 
@@ -283,6 +304,7 @@ public:
     char pad_0xbb4[0xc];
     unsigned char m_nAbilityMode;                   // 0xbc0
 
+    void InitializeMap(); // 0x0062B0A0
     void HideLetterbox();                           // 0x0062AB90
     int IsDialogForced();                           // 0x0062ABD0
     int HideSWInGameGui(int bHide);                 // 0x0062CBA0
@@ -295,8 +317,58 @@ public:
 
 class CClientOptions {
 public:
-    char pad_0x0[0x14];
-    unsigned long m_nFlags;                         // 0x14
+    void SetControlDefaults(); // 0x0061D500
+    void SetShadows(int bEnabled); // 0x0061D6B0
+    void SetSoftShadows(int bEnabled); // 0x0061D6D0
+    void SetGrass(int bEnabled); // 0x0061D6F0
+    void SetLargeFont(int bLarge); // 0x0061D910
+    void SetAutoLevelUpNPCs(int bAuto); // 0x0061B740
+    void SetGameDefaults(); // 0x0061D4E0
+    void SetGraphicsDefaults(); // 0x0061D520 (advanced graphics)
+    void SetSoundDefaults(); // 0x0061D540
+    void SetSoundQualityDefault(); // 0x0061D550
+    void SetFeedbackDefaults(); // 0x0061D950
+    void SetDisplayDefaults(); // 0x0061D9A0
+    void SetBrightnessDefaults(); // 0x0061D9D0 (mouse)
+
+    char pad_0x0[4];
+    unsigned char m_nDifficulty;
+    char pad_0x5[3];
+    union {
+        unsigned long m_nGameplayFlags;
+        struct {
+            unsigned long m_bGame0 : 1;
+            unsigned long m_bGame1 : 1;
+            unsigned long m_bGame2 : 1;
+            unsigned long m_bGame3 : 1;
+            unsigned long m_bGame4 : 1;
+            unsigned long m_bGameRemaining : 27;
+        };
+    };
+    char pad_0xc[8];
+    union {
+        unsigned long m_nFlags;
+        struct {
+            unsigned long m_bFeedback0 : 1;
+            unsigned long m_bFeedback1 : 1;
+            unsigned long m_bFeedback2 : 1;
+            unsigned long m_bFeedback3 : 1;
+            unsigned long m_bFeedback4 : 1;
+            unsigned long m_bFeedback5 : 1;
+            unsigned long m_bFeedback6 : 1;
+            unsigned long m_bFeedback7 : 1;
+            unsigned long m_bFeedback8 : 1;
+            unsigned long m_bFeedback9 : 1;
+            unsigned long m_bFeedback10 : 1;
+            unsigned long m_bFeedbackRemaining : 21;
+        };
+    };                         // 0x14
+    char pad_0x18[0xc];
+    int m_bShadows; // 0x24
+    char pad_0x28[4];
+    int m_bGrass; // 0x2c
+    char pad_0x30[0x20];
+    unsigned char m_nMouseSensitivity; // 0x50
 };
 
 class CClientExoAppInternal;
@@ -330,6 +402,7 @@ public:
     CSWGuiManager* GetGuiManager();                 // 0x005EDA40
     void SetInputClass(int nClass, int bForce);     // 0x005EDA60
     void SetUnknown1a8(int a, int b, int c);        // 0x005EDE10
+    void ShowTutorialWindow(int, int, int, int); // 0x005EDF40
     void SaveOptions();                             // 0x005EDF70
     CSWCCreature* GetPlayerCreature();              // 0x005ED540
     int ChangeCharacterToNextLivingPartyMember(int a, int b, int c);  // 0x005EDF80

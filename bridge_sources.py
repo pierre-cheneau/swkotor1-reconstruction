@@ -890,24 +890,29 @@ class Unit:
         """body with each used matched extern global bound: a reference to the playable storage, or for read-only
         data a copy of the value every playable definition agrees on. Returns (body, bound, unbound)."""
         bound, unbound, edits = [], [], []
+        declarations: dict[str, list[tuple[cpp_scope.Statement, cpp_scope.Variable]]] = {}
         for statement in cpp_scope.statements(body):
             v = cpp_scope.variables(statement)
-            if not v or v.defined or not v.external or v.reference or statement.c_linkage or statement.namespace:
-                continue
-            if len(re.findall(rf"\b{re.escape(v.name)}\b", body)) < 2:
-                continue                                         # declared, never used
+            if v and not v.defined and v.external and not v.reference and not statement.c_linkage \
+                    and not statement.namespace:
+                declarations.setdefault(v.name, []).append((statement, v))
+        for name, declared_at in declarations.items():
+            if len(re.findall(rf"\b{re.escape(name)}\b", body)) <= len(declared_at):
+                continue                                         # declared (perhaps by several headers), never used
+            statement, v = declared_at[0]
             target = self.global_binding(v)
             if isinstance(target, str):
-                unbound.append((v.name, target))
+                unbound.append((name, target))
                 continue
-            bound.append((v.name, target))
+            bound.append((name, target))
             matched = f"{v.type}{v.bounds}"
             q = target.qualified if isinstance(target, Storage) else ""
             edits.append((statement.start, statement.end,
-                          f"{constant_type(v.type)} {v.name} = {target.value};" if isinstance(target, Constant) else
+                          f"{constant_type(v.type)} {name} = {target.value};" if isinstance(target, Constant) else
                           f'static_assert(sizeof({matched}) <= sizeof({q}), "the playable storage is too small"); '
-                          f"kotor_bridge::ref<{matched}> {v.name} = reinterpret_cast<kotor_bridge::ref<{matched}>>"
+                          f"kotor_bridge::ref<{matched}> {name} = reinterpret_cast<kotor_bridge::ref<{matched}>>"
                           f"(const_cast<kotor_bridge::storage<decltype({q})>&>({q}));"))
+            edits += [(s.start, s.end, f"// {name}: bound above") for s, _ in declared_at[1:]]   # one definition
         for start, end, text in sorted(edits, reverse=True):
             body = body[:start] + text + body[end:]
         return body, bound, unbound

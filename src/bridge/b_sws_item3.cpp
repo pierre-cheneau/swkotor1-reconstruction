@@ -335,6 +335,7 @@ public:
     void* GetAtPos(void* pPos);                                 // 0x005E9B60
     void* GetNext(void*& pPos);                                 // 0x005E9B90
     void* RemoveHead();                                         // 0x005E9C80
+    void* AddTail(void* pObject);                               // 0x005E9DC0
     void* GetHead() { return m_pHead == NULL ? NULL : m_pHead->pObject; }
 
     CExoLinkedListNode* m_pHead;
@@ -890,6 +891,7 @@ public:
     void Shutdown(int bArg1, int bArg2);                                // 0x004AE890
     void MovePlayerToArea(class CSWSPlayer* pPlayer);                   // 0x004AE940
     int GetPauseState(unsigned char nState);                            // 0x004AE980
+    CExoLinkedList<unsigned long>* GetActiveExclusionList();             // 0x004AE9D0
     class CSWGlobalVariableTable* GetGlobalVariableTable();             // 0x004AEE60
     void SetExportAllCharactersPending(int bPending);                   // 0x004AECE0
     class CSWSDoor* GetDoorByGameObjectID(unsigned long nId);           // 0x004AE7C0
@@ -944,6 +946,8 @@ public:
     int IsMoviePlaying();                                               // 0x005EDB40
     void AddMovieToMovieQueue(const CExoString& sMovie, int bSkippable); // 0x005EE210
     void ResetDriveAcceleration();                                      // 0x005EDBA0
+    void SetPauseState(unsigned char nType, int nState,
+                        CExoLinkedList<unsigned long>* pExcludedObjects); // 0x005ED650
     void HideLoadScreen(int a1, int a2);                                // 0x005EDA90
     void PlayMovie(const CExoString& sMovie, int* pResult, int a3, int a4); // 0x005EDB30
     void StartPazaakGame(int nOpponentDeck, const CExoString& sEndScript, int nMaxWager,
@@ -1055,6 +1059,7 @@ public:
     class CSWFeat* GetFeat(unsigned short nFeat);            // 0x00550C00
     int GetDifficultyValue(int nColumn, int nRow);          // 0x00550C30 (name guessed)
     void LoadDifficultyInfo();                              // 0x00550C50
+    unsigned long GetWeightedDamageAmount(unsigned long nRoll, unsigned long nMax, unsigned long bAttackerPC, unsigned long bDefenderPC, unsigned long nPercent); // 0x00550D10
 
     CTwoDimArrays* Get2DArrays() { return m_p2DArrays; }
     class CSWBaseItemArray* GetBaseItemArray() { return m_pBaseItemArray; }
@@ -1422,7 +1427,8 @@ public:
     ~CLastUpdateObject();                                       // 0x005CA6A0
 
     CSWSCreatureAppearanceInfo m_cAppearance;                   // 0x0
-    char pad_0x24[0x2a - 0x24];
+    int m_bUpdated;                                             // 0x24
+    char pad_0x28[0x2a - 0x28];
     unsigned short m_n2A;                                       // 0x2a
     unsigned long m_nId;                                        // 0x2c
     char pad_0x30[0x90 - 0x30];

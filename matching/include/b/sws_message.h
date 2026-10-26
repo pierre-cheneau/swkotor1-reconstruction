@@ -12,6 +12,7 @@
 class CSWSPlayer;
 class CSWSItem;
 class CSWSCreature;
+class CSWSObject;
 
 class CResRef;
 class CGameObject;
@@ -19,6 +20,7 @@ class CSWSDoor;
 class CSWSPlaceable;
 class CLastUpdateObject;
 class CSWSPlayerLastUpdateObject;
+class CSWSPlayerLUOSortedObjectList;
 class CLoopingVisualEffect;
 class CSWSTrigger;
 template <class T> class CExoArrayList;
@@ -54,6 +56,7 @@ public:
     void WriteINT(int nValue, int nBits);                               // 0x004D6340
     void WriteDWORD(unsigned long nValue, int nBits);                   // 0x004D6340
     void WriteFLOAT(float fValue, float fScale, int nBits);             // 0x004D6920
+    void WriteVector(const Vector& vValue);                            // 0x004D71B0
     void WriteCExoString(const CExoString& sValue, int nBits);          // 0x004D6960
     void WriteCResRef(CResRef cResRef, int nBits);                      // 0x004D6380
     int GetWriteMessage(unsigned char** ppMessage, unsigned long* pnSize); // 0x004D6440
@@ -73,6 +76,7 @@ public:
 
 class CSWMessage : public CNWMessage {
 public:
+    unsigned long PeekAtWriteMessageSize();                             // 0x00405040
     void CreateWriteMessage(unsigned long nSize, unsigned long nPlayerId,
                             int bArg);                                  // 0x004D68A0
     CResRef ReadCResRef(int nBits);                                     // 0x004D6180
@@ -84,6 +88,17 @@ public:
     int SendServerToPlayerCCMessage(unsigned long nPlayerId, unsigned char nMinor,
                                     class CSWCCMessageData* pData,
                                     class CSWSCombatAttackData* pAttackData); // 0x00568570
+    int SendServerToServerAdminMessage(unsigned long nPlayerId, const CExoString& sMessage); // 0x00579890
+    int SendServerToAllPlayersCreatureUpdate_StripEquippedItems(unsigned long oidCreature); // 0x00570180 (name inferred)
+    int SendServerToPlayerSafeProjectileProjectile(CSWSPlayer* pPlayer,
+        unsigned long oidSource, unsigned long oidTarget, Vector vSource, Vector vTarget,
+        unsigned long nProjectile, unsigned char nType, int nTravelTime,
+        unsigned char nFlags, unsigned char nAttackType, int nExtra); // 0x0056E5F0
+    int SendServerToPlayerSafeProjectileSpell(CSWSPlayer* pPlayer,
+        unsigned long oidSource, unsigned long oidTarget, Vector vSource, Vector vTarget,
+        unsigned long nProjectile, unsigned char nType, int nExtra,
+        unsigned char nItem, unsigned char nFlags, unsigned char nAttackType,
+        int nExtra1, int nExtra2); // 0x0056E6E0 (name inferred)
 
     // Player-to-server handlers.
     int HandlePlayerToServerQuickChatMessage(CSWSPlayer* pPlayer, unsigned char nMinor);
@@ -160,6 +175,30 @@ public:
     void AddTriggerGeometryToMessage(CSWSTrigger* pTrigger);            // 0x00567C20
     void UpdateLastUpdateObjectAppearance(CGameObject* pObject, CLastUpdateObject* pLast,
                                           unsigned long nFlags);        // 0x00568480
+    void UpdateLastUpdateObject(CSWSPlayer* pPlayer, CSWSObject* pObject,
+                                 CLastUpdateObject* pLast, unsigned long nFlags); // 0x00575C80
+    void StoreValuesInLastUpdateObject(CSWSPlayer* pPlayer, CLastUpdateObject* pLast,
+                                        CSWSObject* pObject, unsigned long nFlags,
+                                        unsigned long nAppearanceFlags); // 0x00576FC0
+    void WriteGameObjUpdate_CharacterSheet(CSWSPlayer* pPlayer, unsigned long nFlags); // 0x0056F490
+    void WriteGameObjUpdate_MinorGUIPanels(CSWSPlayer* pPlayer); // 0x00572990
+    unsigned long ComputeUpdateRequired(CSWSPlayer* pPlayer, CSWSObject* pObject,
+                                         CLastUpdateObject* pLast, int bSelf); // 0x0056B950
+    CLastUpdateObject* CreateNewLastUpdateObject(CSWSPlayer* pPlayer, CSWSObject* pObject,
+                                                 unsigned long* pFlags,
+                                                 unsigned long* pAppearanceFlags); // 0x00577000
+    void TestObjectUpdateDifferences(CSWSPlayer* pPlayer, CSWSObject* pObject,
+                                      CLastUpdateObject** ppLast, unsigned long* pFlags,
+                                      unsigned long* pAppearanceFlags); // 0x00577FA0
+    int TestObjectVisible(CSWSObject* pObject, CSWSObject* pObserver); // 0x0056DC60
+    void DeleteLastUpdateObjectsForObject(CSWSPlayer* pPlayer, unsigned long oidObject); // 0x0056E190
+    void WriteGameObjUpdate_UpdateObject(CSWSPlayer* pPlayer, CSWSObject* pObject,
+        CLastUpdateObject* pLast, unsigned long nFlags, unsigned long nAppearanceFlags); // 0x00574A10
+    void ComputeGameObjectUpdateForObject(CSWSPlayer* pPlayer, CSWSObject* pObserver,
+        CGameObjectArray* pArray, unsigned long oidObject); // 0x00578060
+    int ComputeGameObjectUpdateForCategory(unsigned long nCategory, unsigned long nLimit,
+        CSWSPlayer* pPlayer, CSWSObject* pObserver, CGameObjectArray* pArray,
+        CSWSPlayerLUOSortedObjectList* pObjects, int nCount); // 0x00578130
     int CompareObjectIdLists(CExoArrayList<unsigned long>* pList1,
                              CExoArrayList<unsigned long>* pList2); // 0x0056B830 (name guessed)
     int ComputeVisibilityLists(CSWSCreature* pCreature,

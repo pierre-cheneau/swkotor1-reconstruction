@@ -38,16 +38,17 @@ OUTPUT = ROOT / "matching" / "symbols.csv"
 
 
 def relocated_functions(obj):
-    """{function symbol: [(offset, type, target symbol, target is code)]}."""
+    """{function symbol: [(offset, type, target symbol, target is code, addend)]}. COFF keeps a member or element
+    offset in the relocated field itself (the addend), which the linked address includes."""
     coff = CoffObject.read(obj)
     return {symbol.name: [(r.offset - symbol.value, r.type, coff.symbols[r.symbol].name,
-                           coff.symbols[r.symbol].is_function)
-                          for r in coff.section_of(symbol).relocations
+                           coff.symbols[r.symbol].is_function, struct.unpack_from("<I", section.data, r.offset)[0])
+                          for r in section.relocations
                           if r.type in (REL32, DIR32) and r.offset >= symbol.value]
-            for symbol in coff.defined_functions()}
+            for symbol in coff.defined_functions() for section in (coff.section_of(symbol),)}
 
 
-def scan(src, flags, matched, pe, msvc):
+def scan(src, flags, matched, pe, msvc=None):
     """[(symbol, address, role)] for the matched functions in one source."""
     wanted = [(a, q) for a, q in matchcmp.annotated_functions(src) if a in matched]
     if not wanted:
@@ -63,14 +64,15 @@ def scan(src, flags, matched, pe, msvc):
             continue
         symbol = hits[0]
         out.append((symbol, address, "defines"))
-        for offset, rtype, target, is_code in funcs[symbol]:
+        for offset, rtype, target, is_code, addend in funcs[symbol]:
             if target.startswith("$") or target == "__except_list":
                 continue  # file-local labels and the fs:[0] SEH head
             value = struct.unpack("<I", pe.get_data(address - base + offset, 4))[0]
+            # the linked field holds symbol + addend: map the named symbol's own base
             if rtype == REL32:
-                out.append((target, (address + offset + 4 + value) & 0xFFFFFFFF, "calls"))
+                out.append((target, (address + offset + 4 + value - addend) & 0xFFFFFFFF, "calls"))
             else:
-                out.append((target, value, "calls" if is_code else "data"))
+                out.append((target, (value - addend) & 0xFFFFFFFF, "calls" if is_code else "data"))
     return out
 
 
