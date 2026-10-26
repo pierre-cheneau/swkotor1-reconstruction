@@ -11,6 +11,16 @@ This project has two decompilations of the same executable:
 
 See [STRUCTURE.md](STRUCTURE.md). Milestones follow [STATUS.md](STATUS.md).
 
+## This fork
+
+This is an unofficial fork of [mattlgroff/swkotor1-reconstruction](https://github.com/mattlgroff/swkotor1-reconstruction). It adds:
+
+- Python tooling run through [uv](https://docs.astral.sh/uv/), linted with ruff, with its behaviour locked by golden tests.
+- A bridge that compiles byte-identical matched functions from `matching/` into the playable build (`bridge_sources.py`, `src/bridge/`): 40 functions so far, each replacing playable code that implemented the same logic. See [STRUCTURE.md](STRUCTURE.md#2-the-bridge-matched-code-inside-the-playable-build).
+- `bridge_gate.py`, which checks every bridged function against your own original executable by emulation (see [BUILDING.md](BUILDING.md#verify-the-bridge)).
+
+All bridged functions pass that check, but they have not been play-tested yet. Like upstream, this fork supports only the GOG Windows 1.03 executable.
+
 ## Supported version
 
 The project targets the English **GOG Windows 1.03** release. The original `swkotor.exe` is a 32-bit executable with file and product version **1.0.3.0** and a size of **4,042,752 bytes**.
